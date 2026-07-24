@@ -1,0 +1,429 @@
+[
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#deep-learning",
+    "href": "slides/semana-01/sesion-01-introduccion.html#deep-learning",
+    "title": "Deep Learning",
+    "section": "Deep Learning",
+    "text": "Deep Learning\nArquitecturas, entrenamiento, diagnóstico e interpretación\nWilmer Pineda-Ríos\nPrograma de Ciencia de Datos · Universidad Externado de Colombia"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#la-pregunta-del-semestre",
+    "href": "slides/semana-01/sesion-01-introduccion.html#la-pregunta-del-semestre",
+    "title": "Deep Learning",
+    "section": "La pregunta del semestre",
+    "text": "La pregunta del semestre\n\n¿Cuándo una arquitectura profunda aprende una representación útil y qué evidencia necesitamos para confiar en ella?\n\nNo basta con obtener una métrica alta. Debemos explicar qué entra, qué se transforma, cómo se aprende y dónde falla."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#ruta-de-hoy",
+    "href": "slides/semana-01/sesion-01-introduccion.html#ruta-de-hoy",
+    "title": "Deep Learning",
+    "section": "Ruta de hoy",
+    "text": "Ruta de hoy\n\nUbicar Deep Learning dentro de la línea analítica.\nEntender qué cambia frente a Machine Learning.\nConocer la forma de trabajo y el proyecto.\nConstruir un perfil diagnóstico.\nMirar por primera vez dentro de una red."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#ia-machine-learning-y-deep-learning",
+    "href": "slides/semana-01/sesion-01-introduccion.html#ia-machine-learning-y-deep-learning",
+    "title": "Deep Learning",
+    "section": "IA, Machine Learning y Deep Learning",
+    "text": "IA, Machine Learning y Deep Learning\nInteligencia artificial\n└── Aprendizaje automático\n    └── Aprendizaje profundo\n\nIA: sistemas que realizan tareas asociadas con comportamiento inteligente.\nML: sistemas que ajustan su comportamiento usando datos.\nDL: ML basado en composiciones de capas que aprenden representaciones.\n\nDeep Learning no es sinónimo de IA generativa."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#qué-recibimos-de-ml1-y-ml2",
+    "href": "slides/semana-01/sesion-01-introduccion.html#qué-recibimos-de-ml1-y-ml2",
+    "title": "Deep Learning",
+    "section": "¿Qué recibimos de ML1 y ML2?",
+    "text": "¿Qué recibimos de ML1 y ML2?\n\n\n\nYa sabemos construir\nAhora debemos comprender\n\n\n\n\nProblema y variable objetivo\nRepresentación interna\n\n\nTrain, validación y test\nArquitectura y flujo de información\n\n\nBaseline y métrica\nDinámica del entrenamiento\n\n\nSesgo, varianza y complejidad\nGradientes y estabilidad\n\n\nPipelines y trazabilidad\nTransferencia y explicabilidad específica"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#el-cambio-central-aprender-representaciones",
+    "href": "slides/semana-01/sesion-01-introduccion.html#el-cambio-central-aprender-representaciones",
+    "title": "Deep Learning",
+    "section": "El cambio central: aprender representaciones",
+    "text": "El cambio central: aprender representaciones\nEn modelos clásicos solemos diseñar muchas variables de entrada.\nEn una red profunda, las capas intermedias pueden construir representaciones progresivas:\n\nDato→Patrones simples→Representación→Decisión"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#profundidad-no-significa-magia",
+    "href": "slides/semana-01/sesion-01-introduccion.html#profundidad-no-significa-magia",
+    "title": "Deep Learning",
+    "section": "Profundidad no significa magia",
+    "text": "Profundidad no significa magia\nUna red sigue siendo una función parametrizada:\n\n\\hat y=f(x;\\theta)\n\n\nx: dato de entrada;\n\\theta: pesos y sesgos aprendibles;\nf: composición definida por la arquitectura;\n\\hat y: salida del modelo.\n\nLa arquitectura restringe qué clase de funciones resulta fácil aprender."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#abramos-una-capa",
+    "href": "slides/semana-01/sesion-01-introduccion.html#abramos-una-capa",
+    "title": "Deep Learning",
+    "section": "Abramos una capa",
+    "text": "Abramos una capa\n\nUna capa densa calcula Z=XW+b y después aplica una función A=\\phi(Z).\n\n\n\n\nObjeto\nShape de ejemplo\nPapel\n\n\n\n\nX\n(32, 10)\n32 casos, 10 características\n\n\nW\n(10, 8)\nconexiones aprendibles\n\n\nb\n(8,)\ndesplazamiento por unidad\n\n\nA\n(32, 8)\nnueva representación\n\n\n\nNo conocemos aún los valores de W, pero ya podemos auditar la operación."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#cuatro-estructuras-de-datos-cuatro-sesgos",
+    "href": "slides/semana-01/sesion-01-introduccion.html#cuatro-estructuras-de-datos-cuatro-sesgos",
+    "title": "Deep Learning",
+    "section": "Cuatro estructuras de datos, cuatro sesgos",
+    "text": "Cuatro estructuras de datos, cuatro sesgos\n\n\n\nDato\nArquitectura característica\nSesgo inductivo\n\n\n\n\nTabular\nMLP\ninteracciones entre variables\n\n\nSecuencia\nRNN/LSTM\norden y memoria\n\n\nImagen\nCNN\nlocalidad y patrones compartidos\n\n\nTokens\nTransformer\nrelaciones mediante atención\n\n\n\nElegir arquitectura es formular una hipótesis sobre la estructura del problema."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#ejemplo-visión",
+    "href": "slides/semana-01/sesion-01-introduccion.html#ejemplo-visión",
+    "title": "Deep Learning",
+    "section": "Ejemplo: visión",
+    "text": "Ejemplo: visión\nUna CNN no recibe el concepto “borde”. Aprende filtros reutilizables que responden a configuraciones espaciales.\n\nSi barajamos todos los píxeles de una imagen de la misma forma, ¿qué información se conserva y cuál se destruye?"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#ejemplo-lenguaje",
+    "href": "slides/semana-01/sesion-01-introduccion.html#ejemplo-lenguaje",
+    "title": "Deep Learning",
+    "section": "Ejemplo: lenguaje",
+    "text": "Ejemplo: lenguaje\nLa frase cambia si cambia el orden. Una representación útil debe distinguir:\n\nqué elementos aparecen;\ndónde aparecen;\ncon cuáles otros se relacionan;\nqué contexto modifica su significado.\n\nLa atención hará explícita parte de esa interacción, pero no convierte automáticamente una explicación en causalidad."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#ejemplo-series-de-tiempo",
+    "href": "slides/semana-01/sesion-01-introduccion.html#ejemplo-series-de-tiempo",
+    "title": "Deep Learning",
+    "section": "Ejemplo: series de tiempo",
+    "text": "Ejemplo: series de tiempo\nPredecir demanda mañana no permite mezclar observaciones futuras durante la validación.\nDeep Learning no elimina las reglas metodológicas aprendidas:\n\nparticiones honestas;\nbaseline;\nmétrica ligada al costo;\ntrazabilidad;\nanálisis de error."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#lo-que-puede-salir-mal",
+    "href": "slides/semana-01/sesion-01-introduccion.html#lo-que-puede-salir-mal",
+    "title": "Deep Learning",
+    "section": "Lo que puede salir mal",
+    "text": "Lo que puede salir mal\n\nLa pérdida no disminuye.\nEl gradiente se desvanece o explota.\nLa red memoriza el entrenamiento.\nLa métrica oculta fallas importantes.\nEl modelo aprende un artefacto del dataset.\nEl costo de entrenar no justifica la mejora.\n\nEste curso trata esos comportamientos como evidencia para diagnosticar."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#cómo-trabajaremos",
+    "href": "slides/semana-01/sesion-01-introduccion.html#cómo-trabajaremos",
+    "title": "Deep Learning",
+    "section": "Cómo trabajaremos",
+    "text": "Cómo trabajaremos\nCada mecanismo seguirá el mismo recorrido:\n\nintuición;\noperación matemática y shapes;\ncódigo mínimo;\nexperimento controlado;\nvisualización;\ninterpretación y límites."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#herramientas",
+    "href": "slides/semana-01/sesion-01-introduccion.html#herramientas",
+    "title": "Deep Learning",
+    "section": "Herramientas",
+    "text": "Herramientas\n\nTensorFlow y Keras para construir y entrenar.\nNumPy para abrir operaciones seleccionadas.\nMatplotlib y TensorBoard para observar evidencia.\nPoetry y Python 3.11 para reproducibilidad.\nQuarto y Jupyter para comunicar el proceso.\n\nCPU es la ruta base. La GPU se usa cuando el experimento, no la moda, lo exige."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#evaluación",
+    "href": "slides/semana-01/sesion-01-introduccion.html#evaluación",
+    "title": "Deep Learning",
+    "section": "Evaluación",
+    "text": "Evaluación\n\n\n\nComponente\nPeso\n\n\n\n\nParcial 1\n20 %\n\n\nParcial 2\n20 %\n\n\nExamen final\n20 %\n\n\nProyecto integrador\n20 %\n\n\nTalleres, quices y trabajo en clase\n20 %\n\n\n\nEl diagnóstico inicial es formativo y no punitivo."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#proyecto-una-pregunta-incómoda",
+    "href": "slides/semana-01/sesion-01-introduccion.html#proyecto-una-pregunta-incómoda",
+    "title": "Deep Learning",
+    "section": "Proyecto: una pregunta incómoda",
+    "text": "Proyecto: una pregunta incómoda\n\n¿La profundidad realmente se justificaba para este problema?\n\nEl proyecto debe:\n\ncomprender y replicar un artículo;\ntrasladarlo a un problema local;\ncompararlo con una línea base;\nauditar qué aprendió;\ndictaminar con evidencia, incluso si la respuesta es “no”."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#tres-fases",
+    "href": "slides/semana-01/sesion-01-introduccion.html#tres-fases",
+    "title": "Deep Learning",
+    "section": "Tres fases",
+    "text": "Tres fases\n\n\n\n\n\n\n\nFase\nEvidencia\n\n\n\n\nComprensión y formulación\nartículo, problema, datos, baseline y plan\n\n\nReplicación y traslado\nreproducción, transferencia y dinámica del entrenamiento\n\n\nAuditoría y comunicación\nexplicabilidad, fallas, costo y dictamen\n\n\n\nTodos los integrantes deben poder defender las decisiones técnicas."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#reglas-de-reproducibilidad",
+    "href": "slides/semana-01/sesion-01-introduccion.html#reglas-de-reproducibilidad",
+    "title": "Deep Learning",
+    "section": "Reglas de reproducibilidad",
+    "text": "Reglas de reproducibilidad\n\nSemillas y dependencias declaradas.\nSeparación de selección y evaluación final.\nOrigen y licencia de datos documentados.\nConfiguración y curvas conservadas.\nUso de IA declarado y comprendido.\nResultados negativos reportados, no escondidos."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#diagnóstico-de-entrada",
+    "href": "slides/semana-01/sesion-01-introduccion.html#diagnóstico-de-entrada",
+    "title": "Deep Learning",
+    "section": "Diagnóstico de entrada",
+    "text": "Diagnóstico de entrada\n24 preguntas · 6 áreas · 25–30 minutos\n\nPython y NumPy\nÁlgebra lineal y tensores\nCálculo y gradientes\nProbabilidad y pérdidas\nValidación y generalización\nInterpretación de evidencia\n\nEl resultado produce una ruta de nivelación, no una etiqueta."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#después-del-diagnóstico",
+    "href": "slides/semana-01/sesion-01-introduccion.html#después-del-diagnóstico",
+    "title": "Deep Learning",
+    "section": "Después del diagnóstico",
+    "text": "Después del diagnóstico\nMire primero el perfil, no solo el total.\n\n\n\nResultado por área\nAcción\n\n\n\n\n0–1 de 4\nPrioridad de nivelación\n\n\n2 de 4\nRefuerzo necesario\n\n\n3 de 4\nBase funcional\n\n\n4 de 4\nBase sólida; asumir reto adicional"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#una-red-en-una-línea",
+    "href": "slides/semana-01/sesion-01-introduccion.html#una-red-en-una-línea",
+    "title": "Deep Learning",
+    "section": "Una red en una línea",
+    "text": "Una red en una línea\n\nX \\longrightarrow XW+b \\longrightarrow \\phi(XW+b) \\longrightarrow \\hat y\n\n\nAntes de ejecutar Keras, ¿qué debemos conocer para anticipar el shape de cada objeto y el número de parámetros?"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-01-introduccion.html#próxima-sesión",
+    "href": "slides/semana-01/sesion-01-introduccion.html#próxima-sesión",
+    "title": "Deep Learning",
+    "section": "Próxima sesión",
+    "text": "Próxima sesión\nTensores, shapes y primer MLP completo\nVamos a calcular una red pequeña a mano, reproducirla con NumPy y comprobar que Keras hace exactamente la misma operación."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#tensores-y-primer-mlp",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#tensores-y-primer-mlp",
+    "title": "Deep Learning",
+    "section": "Tensores y primer MLP",
+    "text": "Tensores y primer MLP\nSeguir la forma antes de entrenar\nDeep Learning · Sesión 2"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#resultado-de-aprendizaje",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#resultado-de-aprendizaje",
+    "title": "Deep Learning",
+    "section": "Resultado de aprendizaje",
+    "text": "Resultado de aprendizaje\nAl terminar podrá:\n\nrepresentar datos como tensores;\nanticipar shapes y parámetros de capas densas;\ncalcular un forward pass pequeño;\nconstruir y entrenar el MLP equivalente en Keras;\nleer la primera evidencia de aprendizaje."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#el-error-que-queremos-evitar",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#el-error-que-queremos-evitar",
+    "title": "Deep Learning",
+    "section": "El error que queremos evitar",
+    "text": "El error que queremos evitar\nValueError: expected shape=(None, 10), found shape=(10, 32)\nLa mayoría de los primeros errores de una red no son “de IA”: son desacuerdos entre la semántica de los ejes."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#de-escalar-a-tensor",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#de-escalar-a-tensor",
+    "title": "Deep Learning",
+    "section": "De escalar a tensor",
+    "text": "De escalar a tensor\n\n\n\nObjeto\nRango\nEjemplo\n\n\n\n\nEscalar\n0\ntemperatura\n\n\nVector\n1\ncaracterísticas de un caso\n\n\nMatriz\n2\nlote tabular\n\n\nTensor\n3+\nsecuencia, imagen o lote estructurado\n\n\n\nEl rango cuenta ejes; el shape informa su longitud."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#shape-no-es-significado",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#shape-no-es-significado",
+    "title": "Deep Learning",
+    "section": "Shape no es significado",
+    "text": "Shape no es significado\nDos tensores pueden tener shape (32, 10) y representar cosas distintas:\n\n32 clientes con 10 variables;\n32 secuencias con 10 pasos;\n32 palabras representadas por 10 números.\n\n\nSiempre nombre la semántica de cada eje antes de diseñar la capa."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#el-eje-batch",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#el-eje-batch",
+    "title": "Deep Learning",
+    "section": "El eje batch",
+    "text": "El eje batch\nEn datos tabulares:\nX\\in\\mathbb{R}^{B\\times D}\n\nB: número de observaciones procesadas juntas;\nD: características por observación.\n\nKeras suele expresar el batch desconocido como None: (None, D)."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#una-capa-densa",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#una-capa-densa",
+    "title": "Deep Learning",
+    "section": "Una capa densa",
+    "text": "Una capa densa\nPara producir H unidades:\nZ=XW+b\n\n\n\nObjeto\nShape\n\n\n\n\nX\n(B, D)\n\n\nW\n(D, H)\n\n\nb\n(H,)\n\n\nZ\n(B, H)\n\n\n\nEl broadcasting suma el mismo vector b a cada fila."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#cuántos-parámetros-aprende",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#cuántos-parámetros-aprende",
+    "title": "Deep Learning",
+    "section": "¿Cuántos parámetros aprende?",
+    "text": "¿Cuántos parámetros aprende?\n\n\\underbrace{D\\times H}_{pesos}+\\underbrace{H}_{sesgos}\n\nUna capa Dense(4) que recibe 3 características aprende:\n3\\times4+4=16\nEl batch no cambia el número de parámetros."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#comprobación-rápida",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#comprobación-rápida",
+    "title": "Deep Learning",
+    "section": "Comprobación rápida",
+    "text": "Comprobación rápida\n\nEntrada (32, 10) → Dense(8)\n\n¿Cuál es el shape de salida?\n\n¿Cuántos parámetros se aprenden?\n\n¿Qué cambia si el batch pasa de 32 a 64?"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#de-una-capa-a-un-mlp",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#de-una-capa-a-un-mlp",
+    "title": "Deep Learning",
+    "section": "De una capa a un MLP",
+    "text": "De una capa a un MLP\n\nA^{(1)}=\\phi(XW^{(1)}+b^{(1)})\n\n\n\\hat y=\\sigma(A^{(1)}W^{(2)}+b^{(2)})\n\nCada salida de capa se convierte en la entrada de la siguiente."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#por-qué-necesitamos-activación",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#por-qué-necesitamos-activación",
+    "title": "Deep Learning",
+    "section": "¿Por qué necesitamos activación?",
+    "text": "¿Por qué necesitamos activación?\nSin activaciones no lineales:\n\n(XW_1)W_2=X(W_1W_2)\n\nApilar transformaciones lineales seguiría siendo una sola transformación lineal. ReLU, sigmoid y otras activaciones cambian la familia de funciones representables."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#microred-221",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#microred-221",
+    "title": "Deep Learning",
+    "section": "Microred 2–2–1",
+    "text": "Microred 2–2–1\nUsaremos:\nx: 2 características\noculta: 2 unidades ReLU\nsalida: 1 unidad sigmoid\nParámetros:\n2\\times2+2+2\\times1+1=9"
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#abramos-el-forward-pass",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#abramos-el-forward-pass",
+    "title": "Deep Learning",
+    "section": "Abramos el forward pass",
+    "text": "Abramos el forward pass\n\n\nZ_1=XW_1+b_1\n\nA_1=ReLU(Z_1)\n\nZ_2=A_1W_2+b_2\n\n\\hat y=sigmoid(Z_2)\n\n\nCada paso conservará un valor, un shape y una interpretación."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#numpy-operación-explícita",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#numpy-operación-explícita",
+    "title": "Deep Learning",
+    "section": "NumPy: operación explícita",
+    "text": "NumPy: operación explícita\nz1 = X @ W1 + b1\na1 = np.maximum(z1, 0.0)\nz2 = a1 @ W2 + b2\ny_hat = 1 / (1 + np.exp(-z2))\nNo hay una red escondida: hay álgebra lineal, no linealidad y parámetros."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#keras-la-misma-operación",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#keras-la-misma-operación",
+    "title": "Deep Learning",
+    "section": "Keras: la misma operación",
+    "text": "Keras: la misma operación\nmodel = keras.Sequential([\n    keras.Input(shape=(2,)),\n    keras.layers.Dense(2, activation=\"relu\"),\n    keras.layers.Dense(1, activation=\"sigmoid\"),\n])\nAsignaremos los mismos pesos y verificaremos np.allclose(y_numpy, y_keras)."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#keras-todavía-no-aprendió",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#keras-todavía-no-aprendió",
+    "title": "Deep Learning",
+    "section": "Keras todavía no aprendió",
+    "text": "Keras todavía no aprendió\nConstruir define la función. Para aprender faltan:\n\nuna función de pérdida;\nun optimizador;\nejemplos con respuestas;\nun ciclo de actualización.\n\ncompile() configura el aprendizaje; fit() ejecuta actualizaciones."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#un-problema-no-lineal-pequeño",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#un-problema-no-lineal-pequeño",
+    "title": "Deep Learning",
+    "section": "Un problema no lineal pequeño",
+    "text": "Un problema no lineal pequeño\nUsaremos datos de dos medias lunas:\n\ndos características visibles;\ndos clases;\nfrontera no lineal;\nentrenamiento rápido en CPU;\ncomparación con regresión logística.\n\nEl objetivo no es “ganar”, sino observar qué representación necesita el problema."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#la-capa-de-salida-depende-de-la-tarea",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#la-capa-de-salida-depende-de-la-tarea",
+    "title": "Deep Learning",
+    "section": "La capa de salida depende de la tarea",
+    "text": "La capa de salida depende de la tarea\n\n\n\nTarea\nUnidades\nActivación\nPérdida típica\n\n\n\n\nRegresión\n1 o más\nlineal\nMSE/MAE\n\n\nBinaria\n1\nsigmoid\nbinary cross-entropy\n\n\nMulticlase exclusiva\nK\nsoftmax\ncategorical cross-entropy\n\n\n\nLa salida expresa la estructura de la variable objetivo."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#compilar-el-primer-mlp",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#compilar-el-primer-mlp",
+    "title": "Deep Learning",
+    "section": "Compilar el primer MLP",
+    "text": "Compilar el primer MLP\nmodel.compile(\n    optimizer=keras.optimizers.SGD(learning_rate=0.05),\n    loss=\"binary_crossentropy\",\n    metrics=[\"accuracy\"],\n)\nUsamos SGD visible y simple. Adam llegará cuando podamos comparar su comportamiento con criterio."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#qué-observamos-durante-fit",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#qué-observamos-durante-fit",
+    "title": "Deep Learning",
+    "section": "¿Qué observamos durante fit?",
+    "text": "¿Qué observamos durante fit?\nhistory = model.fit(\n    X_train, y_train,\n    validation_data=(X_val, y_val),\n    epochs=80,\n    batch_size=32,\n    verbose=0,\n)\nhistory es evidencia: pérdida y métricas por época, separadas para entrenamiento y validación."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#una-primera-lectura-de-curvas",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#una-primera-lectura-de-curvas",
+    "title": "Deep Learning",
+    "section": "Una primera lectura de curvas",
+    "text": "Una primera lectura de curvas\n\nAmbas pérdidas bajan: hay evidencia de aprendizaje.\nEntrenamiento baja y validación sube: posible sobreajuste.\nNinguna baja: capacidad, datos, optimizador o tasa requieren revisión.\nOscilaciones fuertes: el proceso puede ser inestable.\n\nTodavía no diagnosticamos causas; aprendemos a formular preguntas."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#baseline-antes-de-profundidad",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#baseline-antes-de-profundidad",
+    "title": "Deep Learning",
+    "section": "Baseline antes de profundidad",
+    "text": "Baseline antes de profundidad\n\nLa pregunta correcta no es “¿qué accuracy logró la red?”, sino “¿qué aporta frente a una referencia y a qué costo?”.\n\nCompararemos la frontera lineal de una regresión logística con la frontera del MLP en el mismo split."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#reproducibilidad-mínima",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#reproducibilidad-mínima",
+    "title": "Deep Learning",
+    "section": "Reproducibilidad mínima",
+    "text": "Reproducibilidad mínima\nRANDOM_STATE = 42\nkeras.utils.set_random_seed(RANDOM_STATE)\nAdemás registramos:\n\nversiones;\npartición de datos;\narquitectura;\nbatch, épocas y tasa;\ncurvas y evaluación final."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#errores-frecuentes",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#errores-frecuentes",
+    "title": "Deep Learning",
+    "section": "Errores frecuentes",
+    "text": "Errores frecuentes\n\nTransponer ejemplos y características.\nConfundir rango con shape.\nContar el batch como parámetro.\nUsar activación/pérdida incompatibles.\nEvaluar repetidamente sobre test.\ninterpretar model.summary() sin comprobar las operaciones."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#salida-de-clase",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#salida-de-clase",
+    "title": "Deep Learning",
+    "section": "Salida de clase",
+    "text": "Salida de clase\nPara una entrada (64, 20) y capas Dense(10) → Dense(1):\n\nescriba los shapes de pesos, sesgos y activaciones;\ncalcule el número total de parámetros;\nelija salida y pérdida para clasificación binaria;\nindique qué evidencia observaría antes de declarar que la red aprendió."
+  },
+  {
+    "objectID": "slides/semana-01/sesion-02-tensores-primer-mlp.html#próximo-paso",
+    "href": "slides/semana-01/sesion-02-tensores-primer-mlp.html#próximo-paso",
+    "title": "Deep Learning",
+    "section": "Próximo paso",
+    "text": "Próximo paso\nActivaciones y funciones de pérdida\nAhora que podemos seguir el forward pass, estudiaremos cómo la no linealidad cambia la representación y cómo la pérdida traduce el error en una señal de aprendizaje."
+  },
+  {
+    "objectID": "labs/semana-01-shapes.html",
+    "href": "labs/semana-01-shapes.html",
+    "title": "Actividad — Auditoría de shapes",
+    "section": "",
+    "text": "Seguir el flujo de una red antes de ejecutarla y detectar incompatibilidades por inspección."
+  },
+  {
+    "objectID": "labs/semana-01-shapes.html#propósito",
+    "href": "labs/semana-01-shapes.html#propósito",
+    "title": "Actividad — Auditoría de shapes",
+    "section": "",
+    "text": "Seguir el flujo de una red antes de ejecutarla y detectar incompatibilidades por inspección."
+  },
+  {
+    "objectID": "labs/semana-01-shapes.html#arquitectura",
+    "href": "labs/semana-01-shapes.html#arquitectura",
+    "title": "Actividad — Auditoría de shapes",
+    "section": "Arquitectura",
+    "text": "Arquitectura\nUn lote de 32 observaciones tiene 12 características y atraviesa Dense(8) → Dense(4) → Dense(1).\n\nComplete el shape de \\(X\\), pesos, sesgos y activaciones de cada capa.\nCalcule parámetros por capa y total.\nExplique por qué cambiar el batch a 64 no cambia los parámetros.\nProponga activación y pérdida si la tarea es clasificación binaria.\nCompruebe sus respuestas con model.summary()."
+  },
+  {
+    "objectID": "labs/semana-01-shapes.html#evidencia-de-salida",
+    "href": "labs/semana-01-shapes.html#evidencia-de-salida",
+    "title": "Actividad — Auditoría de shapes",
+    "section": "Evidencia de salida",
+    "text": "Evidencia de salida\nEntregue el libro contable de shapes y una explicación de máximo cinco líneas sobre cualquier diferencia encontrada frente a Keras."
+  },
+  {
+    "objectID": "nivelacion/index.html",
+    "href": "nivelacion/index.html",
+    "title": "Rutas de nivelación",
+    "section": "",
+    "text": "El diagnóstico no se interpreta únicamente por el total. Use el perfil por competencia y priorice las áreas con 0–2 respuestas correctas de 4."
+  },
+  {
+    "objectID": "nivelacion/index.html#python-y-numpy",
+    "href": "nivelacion/index.html#python-y-numpy",
+    "title": "Rutas de nivelación",
+    "section": "Python y NumPy",
+    "text": "Python y NumPy\n\nRepase creación de arreglos, indexación, tipos y mutabilidad.\nPractique operaciones vectorizadas, broadcasting y @.\nVerifique siempre dtype, ndim y shape antes de modelar."
+  },
+  {
+    "objectID": "nivelacion/index.html#álgebra-lineal-y-tensores",
+    "href": "nivelacion/index.html#álgebra-lineal-y-tensores",
+    "title": "Rutas de nivelación",
+    "section": "Álgebra lineal y tensores",
+    "text": "Álgebra lineal y tensores\n\nEscriba los shapes antes de multiplicar matrices.\nPractique \\(XW+b\\) para un caso y para un batch.\nCalcule parámetros de una capa densa como \\(D\\times H+H\\)."
+  },
+  {
+    "objectID": "nivelacion/index.html#cálculo-y-gradientes",
+    "href": "nivelacion/index.html#cálculo-y-gradientes",
+    "title": "Rutas de nivelación",
+    "section": "Cálculo y gradientes",
+    "text": "Cálculo y gradientes\n\nRepase derivada, derivada parcial, gradiente y regla de la cadena.\nDistinga dirección del gradiente y dirección de actualización.\nVisualice cómo cambia una función al modificar un parámetro."
+  },
+  {
+    "objectID": "nivelacion/index.html#probabilidad-y-pérdidas",
+    "href": "nivelacion/index.html#probabilidad-y-pérdidas",
+    "title": "Rutas de nivelación",
+    "section": "Probabilidad y pérdidas",
+    "text": "Probabilidad y pérdidas\n\nRevise probabilidades, logits y distribuciones categóricas.\nRelacione sigmoid con clasificación binaria y softmax con multiclase exclusiva.\nCompare MSE y cross-entropy mediante predicciones correctas e incorrectas con distinta confianza."
+  },
+  {
+    "objectID": "nivelacion/index.html#validación-y-generalización",
+    "href": "nivelacion/index.html#validación-y-generalización",
+    "title": "Rutas de nivelación",
+    "section": "Validación y generalización",
+    "text": "Validación y generalización\n\nRecupere la separación entre entrenamiento, validación y prueba.\nAjuste cualquier transformación únicamente con entrenamiento.\nDeclare una referencia simple y una métrica ligada al costo del error."
+  },
+  {
+    "objectID": "nivelacion/index.html#interpretación-de-evidencia",
+    "href": "nivelacion/index.html#interpretación-de-evidencia",
+    "title": "Rutas de nivelación",
+    "section": "Interpretación de evidencia",
+    "text": "Interpretación de evidencia\n\nPractique la lectura conjunta de curvas de entrenamiento y validación.\nCompare métricas con la distribución de clases y el costo del error.\nTrate atribuciones y visualizaciones como evidencia del modelo, no como causalidad automática."
+  },
+  {
+    "objectID": "nivelacion/index.html#comprobación",
+    "href": "nivelacion/index.html#comprobación",
+    "title": "Rutas de nivelación",
+    "section": "Comprobación",
+    "text": "Comprobación\nDespués del refuerzo, vuelva al notebook de la semana 1 y explique cada shape, parámetro y curva sin ejecutar primero la celda correspondiente."
+  }
+]

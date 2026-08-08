@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quiz práctico — Deep Learning</title>
+  <style>
+    :root{--ink:#20152a;--muted:#655d6d;--paper:#f4efe8;--card:#fffdf9;--line:#d9cfbf;--violet:#4b1767;--gold:#d3a62c;--red:#b42335}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 8%,#d3a62c33,transparent 27%),linear-gradient(145deg,var(--paper),#efe9f5);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+    main{width:min(960px,calc(100% - 28px));margin:36px auto}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(24px,5vw,50px);box-shadow:0 22px 55px #28193518;border-top:6px solid var(--gold)}
+    .eyebrow{color:var(--violet);font-weight:850;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;margin:0}.lead{font-size:1.16rem;color:var(--muted);max-width:760px}h1{font-size:clamp(2.2rem,6vw,4.2rem);line-height:1.02;margin:.18em 0}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0}.fact{background:white;border:1px solid var(--line);border-radius:12px;padding:15px}.fact strong{display:block;font-size:1.2rem;color:var(--violet)}
+    .notice{border-left:5px solid var(--gold);background:#fff8e5;padding:13px 16px;margin:20px 0}.countdown{font-size:2.2rem;font-weight:900;font-variant-numeric:tabular-nums;color:var(--violet);margin:7px 0}.button{display:inline-block;background:var(--violet);color:white;text-decoration:none;font-weight:820;padding:14px 22px;border-radius:10px}.button[aria-disabled=true]{background:#756b7b;pointer-events:none}.muted{color:var(--muted)}
+    @media(max-width:650px){.facts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main><section class="card">
+  <p class="eyebrow">Deep Learning · Semana 02</p>
+  <h1>Ocupación de una sala con una microred</h1>
+  <p class="lead">Quiz práctico con una muestra personal de mediciones reales: estandarización, forward pass, binary cross-entropy y un paso de descenso del gradiente.</p>
+  <div class="facts"><div class="fact"><span>Ventana</span><strong>7:00–8:00 p. m.</strong></div><div class="fact"><span>Duración máxima</span><strong>60 minutos</strong></div><div class="fact"><span>Modalidad</span><strong>Individual y sin consultas</strong></div></div>
+  <div class="notice"><strong>Antes de comenzar:</strong> ten a mano tu documento y correo institucional. Solo se admite una entrega y el cierre de las 8:00 p. m. es absoluto.</div>
+  <p id="countdownLabel">La evaluación se habilita a las 7:00 p. m.</p><p id="countdown" class="countdown">--:--:--</p>
+  <p><a id="quizLink" class="button" href="https://script.google.com/macros/s/AKfycbzQG5COcKO3-X10zu0msAvQ4gEsFWV5tbs8zI4_RQCAabZVMGtE820Sln8jEHwZCWkS/exec" target="_blank" rel="noopener" aria-disabled="true">Entrar a la sala de evaluación</a></p>
+  <p id="pending" class="muted">La sala quedará enlazada aquí antes de la evaluación.</p>
+  <p class="muted"><strong>¿Google no abre la sala?</strong> Si tienes varias cuentas de Google activas, abre este enlace en una ventana privada.</p>
+  <p class="muted">La autorización real para iniciar y entregar es controlada por la hora del servidor.</p>
+</section></main>
+<script>
+const OPEN_AT=new Date("2026-07-31T19:00:00-05:00"),CLOSE_AT=new Date("2026-07-31T20:00:00-05:00"),link=document.getElementById("quizLink"),countdown=document.getElementById("countdown"),label=document.getElementById("countdownLabel");
+if(!link.getAttribute("href").includes("__APPS_SCRIPT_WEB_APP_URL__")){link.removeAttribute("aria-disabled");document.getElementById("pending").hidden=true;}
+function render(ms){const s=Math.max(0,Math.floor(ms/1000));countdown.textContent=[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,"0")).join(":");}
+function tick(){const now=new Date();if(now>=CLOSE_AT){label.textContent="La ventana de entrega cerró.";countdown.textContent="Cerrada";}else if(now>=OPEN_AT){label.textContent="Tiempo restante de la ventana:";render(CLOSE_AT-now);}else{label.textContent="La evaluación se habilita a las 7:00 p. m.:";render(OPEN_AT-now);}}
+tick();setInterval(tick,1000);
+</script></body></html>

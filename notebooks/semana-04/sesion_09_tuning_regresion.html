@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Sesión 9 · Tuning de una MLP para producción eléctrica – Deep Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-3e9b1289f5f353c49b617ce48ad2bc38.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/styles/course.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Deep Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../proyecto.html"> 
+<span class="menu-text">Proyecto</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers-datos-colombia.html"> 
+<span class="menu-text">Papers y datos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../nivelacion/index.html"> 
+<span class="menu-text">Nivelación</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../rubricas/index.html"> 
+<span class="menu-text">Rúbricas</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#contrato-experimental-antes-de-entrenar" id="toc-contrato-experimental-antes-de-entrenar" class="nav-link active" data-scroll-target="#contrato-experimental-antes-de-entrenar">1. Contrato experimental antes de entrenar</a></li>
+  <li><a href="#datos-y-significado" id="toc-datos-y-significado" class="nav-link" data-scroll-target="#datos-y-significado">2. Datos y significado</a>
+  <ul class="collapse">
+  <li><a href="#pregunta-antes-de-continuar" id="toc-pregunta-antes-de-continuar" class="nav-link" data-scroll-target="#pregunta-antes-de-continuar">Pregunta antes de continuar</a></li>
+  </ul></li>
+  <li><a href="#referencias-antes-de-la-red" id="toc-referencias-antes-de-la-red" class="nav-link" data-scroll-target="#referencias-antes-de-la-red">3. Referencias antes de la red</a></li>
+  <li><a href="#una-fábrica-común-de-modelos" id="toc-una-fábrica-común-de-modelos" class="nav-link" data-scroll-target="#una-fábrica-común-de-modelos">4. Una fábrica común de modelos</a>
+  <ul class="collapse">
+  <li><a href="#por-qué-no-gridsearch-exhaustivo" id="toc-por-qué-no-gridsearch-exhaustivo" class="nav-link" data-scroll-target="#por-qué-no-gridsearch-exhaustivo">¿Por qué no GridSearch exhaustivo?</a></li>
+  </ul></li>
+  <li><a href="#kerastuner-construcción-y-entrenamiento-como-hiperparámetros" id="toc-kerastuner-construcción-y-entrenamiento-como-hiperparámetros" class="nav-link" data-scroll-target="#kerastuner-construcción-y-entrenamiento-como-hiperparámetros">5. KerasTuner: construcción y entrenamiento como hiperparámetros</a></li>
+  <li><a href="#optuna-objetivo-define-by-run-y-pruning" id="toc-optuna-objetivo-define-by-run-y-pruning" class="nav-link" data-scroll-target="#optuna-objetivo-define-by-run-y-pruning">6. Optuna: objetivo define-by-run y pruning</a></li>
+  <li><a href="#trazabilidad-bajo-el-mismo-presupuesto" id="toc-trazabilidad-bajo-el-mismo-presupuesto" class="nav-link" data-scroll-target="#trazabilidad-bajo-el-mismo-presupuesto">7. Trazabilidad bajo el mismo presupuesto</a></li>
+  <li><a href="#el-mejor-trial-puede-ser-una-inicialización-afortunada" id="toc-el-mejor-trial-puede-ser-una-inicialización-afortunada" class="nav-link" data-scroll-target="#el-mejor-trial-puede-ser-una-inicialización-afortunada">8. El mejor trial puede ser una inicialización afortunada</a></li>
+  <li><a href="#reentrenamiento-y-única-apertura-del-test" id="toc-reentrenamiento-y-única-apertura-del-test" class="nav-link" data-scroll-target="#reentrenamiento-y-única-apertura-del-test">9. Reentrenamiento y única apertura del test</a>
+  <ul class="collapse">
+  <li><a href="#pregunta-de-decisión" id="toc-pregunta-de-decisión" class="nav-link" data-scroll-target="#pregunta-de-decisión">Pregunta de decisión</a></li>
+  </ul></li>
+  <li><a href="#dónde-falla-el-modelo-final" id="toc-dónde-falla-el-modelo-final" class="nav-link" data-scroll-target="#dónde-falla-el-modelo-final">10. ¿Dónde falla el modelo final?</a></li>
+  <li><a href="#pdp-e-ice-interrogar-la-función-predictiva" id="toc-pdp-e-ice-interrogar-la-función-predictiva" class="nav-link" data-scroll-target="#pdp-e-ice-interrogar-la-función-predictiva">11. PDP e ICE: interrogar la función predictiva</a></li>
+  <li><a href="#shap-local-por-qué-esta-predicción-es-baja" id="toc-shap-local-por-qué-esta-predicción-es-baja" class="nav-link" data-scroll-target="#shap-local-por-qué-esta-predicción-es-baja">12. SHAP local: ¿por qué esta predicción es baja?</a></li>
+  <li><a href="#dictamen-para-el-responsable-de-la-planta" id="toc-dictamen-para-el-responsable-de-la-planta" class="nav-link" data-scroll-target="#dictamen-para-el-responsable-de-la-planta">13. Dictamen para el responsable de la planta</a>
+  <ul class="collapse">
+  <li><a href="#conclusión-de-esta-ejecución-modeclass" id="toc-conclusión-de-esta-ejecución-modeclass" class="nav-link" data-scroll-target="#conclusión-de-esta-ejecución-modeclass">Conclusión de esta ejecución (<code>mode=class</code>)</a></li>
+  <li><a href="#recomendación-al-responsable" id="toc-recomendación-al-responsable" class="nav-link" data-scroll-target="#recomendación-al-responsable">Recomendación al responsable</a></li>
+  </ul></li>
+  <li><a href="#manifiesto-de-trazabilidad" id="toc-manifiesto-de-trazabilidad" class="nav-link" data-scroll-target="#manifiesto-de-trazabilidad">14. Manifiesto de trazabilidad</a></li>
+  <li><a href="#mensaje-de-salida" id="toc-mensaje-de-salida" class="nav-link" data-scroll-target="#mensaje-de-salida">Mensaje de salida</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Sesión 9 · Tuning de una MLP para producción eléctrica</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Caso.</strong> Una planta de ciclo combinado opera a carga completa y necesita anticipar su producción eléctrica neta horaria a partir de temperatura, vacío de escape, presión y humedad.</p>
+<p><strong>Pregunta central.</strong> ¿Qué arquitectura y régimen de entrenamiento ofrecen el menor error fuera de muestra bajo un presupuesto explícito, y qué podemos decir —con prudencia— sobre las predicciones del modelo final?</p>
+<p>Al terminar podremos responder:</p>
+<ol type="1">
+<li>¿La MLP supera referencias lineales y tabulares?</li>
+<li>¿Qué configuraciones exploraron KerasTuner y Optuna y cuánto costaron?</li>
+<li>¿El resultado se sostiene entre semillas?</li>
+<li>¿En qué condiciones falla más?</li>
+<li>¿Qué muestran PDP/ICE y SHAP sobre la función predictiva?</li>
+</ol>
+<section id="contrato-experimental-antes-de-entrenar" class="level2">
+<h2 class="anchored" data-anchor-id="contrato-experimental-antes-de-entrenar">1. Contrato experimental antes de entrenar</h2>
+<ul>
+<li>El test se separa al inicio y permanece cerrado hasta elegir la configuración.</li>
+<li>Los escaladores se ajustan exclusivamente con train durante el tuning.</li>
+<li>Ambos tuners reciben el mismo espacio conceptual y presupuesto máximo.</li>
+<li><code>EarlyStopping</code> limita épocas dentro de cada trial; Optuna además puede podar trials.</li>
+<li>La selección usa validación. MAE, RMSE y <span class="math inline">\(R^2\)</span> de test se calculan una sola vez al final.</li>
+</ul>
+<p>El entorno <code>DL_TUNING_MODE</code> controla el presupuesto: <code>smoke</code>, <code>class</code> o <code>full</code>.</p>
+<div id="9f42fd59" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hashlib</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> platform</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>os.environ.setdefault(<span class="st">"TF_CPP_MIN_LOG_LEVEL"</span>, <span class="st">"2"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> keras_tuner <span class="im">as</span> kt</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> optuna</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shap</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.base <span class="im">import</span> clone</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.dummy <span class="im">import</span> DummyRegressor</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> HistGradientBoostingRegressor</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error, mean_squared_error, r2_score</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>, context<span class="op">=</span><span class="st">"notebook"</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>SEED <span class="op">=</span> <span class="dv">260819</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>FEATURES <span class="op">=</span> [<span class="st">"AT"</span>, <span class="st">"V"</span>, <span class="st">"AP"</span>, <span class="st">"RH"</span>]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>TARGET <span class="op">=</span> <span class="st">"PE"</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_root():</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> candidate <span class="kw">in</span> [Path.cwd(), <span class="op">*</span>Path.cwd().parents]:</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (candidate <span class="op">/</span> <span class="st">"pyproject.toml"</span>).exists():</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> candidate</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="st">"No se encontró la raíz del curso"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>ROOT <span class="op">=</span> find_root()</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>MODE <span class="op">=</span> os.getenv(<span class="st">"DL_TUNING_MODE"</span>, <span class="st">"class"</span>).lower()</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>BUDGETS <span class="op">=</span> {</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"smoke"</span>: {<span class="st">"trials"</span>: <span class="dv">2</span>, <span class="st">"epochs"</span>: <span class="dv">5</span>, <span class="st">"patience"</span>: <span class="dv">2</span>, <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">"class"</span>: {<span class="st">"trials"</span>: <span class="dv">8</span>, <span class="st">"epochs"</span>: <span class="dv">60</span>, <span class="st">"patience"</span>: <span class="dv">8</span>, <span class="st">"repeats"</span>: <span class="dv">3</span>},</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"full"</span>: {<span class="st">"trials"</span>: <span class="dv">24</span>, <span class="st">"epochs"</span>: <span class="dv">100</span>, <span class="st">"patience"</span>: <span class="dv">8</span>, <span class="st">"repeats"</span>: <span class="dv">3</span>},</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> MODE <span class="kw">not</span> <span class="kw">in</span> BUDGETS:</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"DL_TUNING_MODE debe ser uno de </span><span class="sc">{</span><span class="bu">list</span>(BUDGETS)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>BUDGET <span class="op">=</span> BUDGETS[MODE]</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>RUN_DIR <span class="op">=</span> ROOT <span class="op">/</span> <span class="st">"notebooks"</span> <span class="op">/</span> <span class="st">"semana-04"</span> <span class="op">/</span> <span class="st">"runs"</span> <span class="op">/</span> MODE</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>RUN_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>tf.keras.utils.set_random_seed(SEED)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">"python"</span>: platform.python_version(),</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tensorflow"</span>: tf.__version__,</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keras_tuner"</span>: kt.__version__,</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"optuna"</span>: optuna.__version__,</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shap"</span>: shap.__version__,</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mode"</span>: MODE,</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>BUDGET,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>d:\Documentos\Universidad Externado\Pregrado en Ciencia de Datos\Deep Learning\.venv\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'python': '3.11.9', 'tensorflow': '2.21.0', 'keras_tuner': '1.4.8', 'optuna': '4.9.0', 'shap': '0.51.0', 'mode': 'class', 'trials': 8, 'epochs': 60, 'patience': 8, 'repeats': 3}</code></pre>
+</div>
+</div>
+</section>
+<section id="datos-y-significado" class="level2">
+<h2 class="anchored" data-anchor-id="datos-y-significado">2. Datos y significado</h2>
+<p>El conjunto <strong>Combined Cycle Power Plant</strong> contiene 9.568 promedios horarios recogidos entre 2006 y 2011 mientras la planta operaba a carga completa. Las variables son:</p>
+<ul>
+<li><code>AT</code>: temperatura ambiente (°C).</li>
+<li><code>V</code>: vacío de escape (cm Hg).</li>
+<li><code>AP</code>: presión ambiente (mbar).</li>
+<li><code>RH</code>: humedad relativa (%).</li>
+<li><code>PE</code>: producción eléctrica neta (MW).</li>
+</ul>
+<p>La fuente no incluye fecha ni identificador temporal. Por ello solo podemos hacer una partición aleatoria y debemos declarar como limitación que no medimos generalización hacia años futuros.</p>
+<p>Fuente: Tüfekci y Kaya (2014), <a href="https://doi.org/10.24432/C5002N">UCI Machine Learning Repository</a>, licencia CC BY 4.0.</p>
+<div id="feafa77d" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DATA_PATH <span class="op">=</span> ROOT <span class="op">/</span> <span class="st">"datasets"</span> <span class="op">/</span> <span class="st">"public"</span> <span class="op">/</span> <span class="st">"combined_cycle_power_plant.csv"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(DATA_PATH)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">list</span>(data.columns) <span class="op">==</span> FEATURES <span class="op">+</span> [TARGET]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> data.shape <span class="op">==</span> (<span class="dv">9568</span>, <span class="dv">5</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="kw">not</span> data.isna().<span class="bu">any</span>().<span class="bu">any</span>()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>data.describe().T.<span class="bu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">AT</th>
+<td>9568.0</td>
+<td>19.65</td>
+<td>7.45</td>
+<td>1.81</td>
+<td>13.51</td>
+<td>20.34</td>
+<td>25.72</td>
+<td>37.11</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">V</th>
+<td>9568.0</td>
+<td>54.31</td>
+<td>12.71</td>
+<td>25.36</td>
+<td>41.74</td>
+<td>52.08</td>
+<td>66.54</td>
+<td>81.56</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">AP</th>
+<td>9568.0</td>
+<td>1013.26</td>
+<td>5.94</td>
+<td>992.89</td>
+<td>1009.10</td>
+<td>1012.94</td>
+<td>1017.26</td>
+<td>1033.30</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">RH</th>
+<td>9568.0</td>
+<td>73.31</td>
+<td>14.60</td>
+<td>25.56</td>
+<td>63.33</td>
+<td>74.97</td>
+<td>84.83</td>
+<td>100.16</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">PE</th>
+<td>9568.0</td>
+<td>454.37</td>
+<td>17.07</td>
+<td>420.26</td>
+<td>439.75</td>
+<td>451.55</td>
+<td>468.43</td>
+<td>495.76</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="f9afc524" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">4.2</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>data.sample(<span class="dv">1800</span>, random_state<span class="op">=</span>SEED), x<span class="op">=</span><span class="st">"AT"</span>, y<span class="op">=</span><span class="st">"PE"</span>, s<span class="op">=</span><span class="dv">18</span>, alpha<span class="op">=</span><span class="fl">.45</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(title<span class="op">=</span><span class="st">"La temperatura anticipa una relación no lineal"</span>, xlabel<span class="op">=</span><span class="st">"Temperatura ambiente (°C)"</span>, ylabel<span class="op">=</span><span class="st">"Producción neta (MW)"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>sns.heatmap(data.corr(), annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"vlag"</span>, center<span class="op">=</span><span class="dv">0</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Las entradas también están correlacionadas"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="sesion_09_tuning_regresion_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="pregunta-antes-de-continuar" class="level3">
+<h3 class="anchored" data-anchor-id="pregunta-antes-de-continuar">Pregunta antes de continuar</h3>
+<p>Si <code>AT</code> y <code>V</code> están correlacionadas, ¿qué combinación poco realista podría crear una curva de dependencia parcial al variar una de ellas y congelar la otra? Conserve esta inquietud para interpretar el modelo final.</p>
+<div id="ef760ce6" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data[FEATURES].copy()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data[TARGET].copy()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 15 % test; del 85 % restante se reserva 15 % del total para validación.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>X_dev, X_test, y_dev, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    X, y, test_size<span class="op">=</span><span class="fl">.15</span>, random_state<span class="op">=</span>SEED</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>X_train, X_val, y_train, y_val <span class="op">=</span> train_test_split(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    X_dev, y_dev, test_size<span class="op">=</span><span class="fl">.15</span> <span class="op">/</span> <span class="fl">.85</span>, random_state<span class="op">=</span>SEED</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>x_scaler <span class="op">=</span> StandardScaler().fit(X_train)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>y_scaler <span class="op">=</span> StandardScaler().fit(y_train.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>X_train_s <span class="op">=</span> x_scaler.transform(X_train).astype(<span class="st">"float32"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>X_val_s <span class="op">=</span> x_scaler.transform(X_val).astype(<span class="st">"float32"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>y_train_s <span class="op">=</span> y_scaler.transform(y_train.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)).astype(<span class="st">"float32"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>y_val_s <span class="op">=</span> y_scaler.transform(y_val.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)).astype(<span class="st">"float32"</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>split_table <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"partición"</span>: [<span class="st">"train"</span>, <span class="st">"validación"</span>, <span class="st">"test cerrado"</span>],</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"filas"</span>: [<span class="bu">len</span>(X_train), <span class="bu">len</span>(X_val), <span class="bu">len</span>(X_test)],</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"uso"</span>: [<span class="st">"aprender pesos"</span>, <span class="st">"seleccionar hiperparámetros"</span>, <span class="st">"evaluar una vez"</span>],</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>split_table</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">partición</th>
+<th data-quarto-table-cell-role="th">filas</th>
+<th data-quarto-table-cell-role="th">uso</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>train</td>
+<td>6696</td>
+<td>aprender pesos</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>validación</td>
+<td>1436</td>
+<td>seleccionar hiperparámetros</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>test cerrado</td>
+<td>1436</td>
+<td>evaluar una vez</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="referencias-antes-de-la-red" class="level2">
+<h2 class="anchored" data-anchor-id="referencias-antes-de-la-red">3. Referencias antes de la red</h2>
+<p>Una red no se justifica por ser una red. Comparamos primero:</p>
+<ul>
+<li>la media de train;</li>
+<li>una regresión lineal;</li>
+<li>gradient boosting, una referencia fuerte para datos tabulares.</li>
+</ul>
+<p>Estas métricas se calculan en <strong>validación</strong>, todavía no en test.</p>
+<div id="90fa7112" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> regression_metrics(y_true, y_pred):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"MAE_MW"</span>: mean_absolute_error(y_true, y_pred),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RMSE_MW"</span>: mean_squared_error(y_true, y_pred) <span class="op">**</span> <span class="fl">.5</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"R2"</span>: r2_score(y_true, y_pred),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>baseline_estimators <span class="op">=</span> {</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Media"</span>: DummyRegressor(strategy<span class="op">=</span><span class="st">"mean"</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Lineal"</span>: LinearRegression(),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Boosting"</span>: HistGradientBoostingRegressor(</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        max_iter<span class="op">=</span><span class="dv">250</span>, learning_rate<span class="op">=</span><span class="fl">.06</span>, l2_regularization<span class="op">=</span><span class="fl">.1</span>, random_state<span class="op">=</span>SEED</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>validation_rows <span class="op">=</span> []</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, estimator <span class="kw">in</span> baseline_estimators.items():</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    estimator.fit(X_train, y_train)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> estimator.predict(X_val)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    validation_rows.append({</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"modelo"</span>: name,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>regression_metrics(y_val, pred),</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"segundos"</span>: time.perf_counter() <span class="op">-</span> started,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(validation_rows).<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">modelo</th>
+<th data-quarto-table-cell-role="th">MAE_MW</th>
+<th data-quarto-table-cell-role="th">RMSE_MW</th>
+<th data-quarto-table-cell-role="th">R2</th>
+<th data-quarto-table-cell-role="th">segundos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Media</td>
+<td>15.026</td>
+<td>17.287</td>
+<td>-0.001</td>
+<td>0.009</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Lineal</td>
+<td>3.614</td>
+<td>4.571</td>
+<td>0.930</td>
+<td>0.013</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Boosting</td>
+<td>2.397</td>
+<td>3.361</td>
+<td>0.962</td>
+<td>3.333</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="una-fábrica-común-de-modelos" class="level2">
+<h2 class="anchored" data-anchor-id="una-fábrica-común-de-modelos">4. Una fábrica común de modelos</h2>
+<p>KerasTuner y Optuna deben construir la misma familia. Cada configuración contiene:</p>
+<ul>
+<li><code>n_layers</code>: 1–3 capas ocultas;</li>
+<li><code>units_i</code>: 32, 64 o 128 unidades en cada capa activa;</li>
+<li><code>dropout</code>: 0, 0,1, 0,2 o 0,3;</li>
+<li><code>batch_size</code>: 32, 64 o 128;</li>
+<li><code>learning_rate</code>: <span class="math inline">\(10^{-4}\)</span> a <span class="math inline">\(3\times10^{-3}\)</span> en escala logarítmica.</li>
+</ul>
+<p>La salida es lineal. Entrenamos sobre un target estandarizado, pero volvemos a MW para comunicar resultados.</p>
+<div id="dbc88fd6" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_mlp(config, seed<span class="op">=</span>SEED):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    tf.keras.backend.clear_session()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    tf.keras.utils.set_random_seed(seed)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tf.keras.Input(shape<span class="op">=</span>(<span class="bu">len</span>(FEATURES),), name<span class="op">=</span><span class="st">"condiciones"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> inputs</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, units <span class="kw">in</span> <span class="bu">enumerate</span>(config[<span class="st">"units"</span>]):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> tf.keras.layers.Dense(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            units, activation<span class="op">=</span><span class="st">"relu"</span>, kernel_initializer<span class="op">=</span><span class="st">"he_normal"</span>, name<span class="op">=</span><span class="ss">f"dense_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        )(x)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> config[<span class="st">"dropout"</span>] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> tf.keras.layers.Dropout(config[<span class="st">"dropout"</span>], seed<span class="op">=</span>seed <span class="op">+</span> i, name<span class="op">=</span><span class="ss">f"dropout_</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>)(x)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    outputs <span class="op">=</span> tf.keras.layers.Dense(<span class="dv">1</span>, name<span class="op">=</span><span class="st">"pe_estandarizada"</span>)(x)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> tf.keras.Model(inputs, outputs)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">compile</span>(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        optimizer<span class="op">=</span>tf.keras.optimizers.Adam(config[<span class="st">"learning_rate"</span>]),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        loss<span class="op">=</span><span class="st">"mse"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        metrics<span class="op">=</span>[<span class="st">"mae"</span>],</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>FIXED_CONFIG <span class="op">=</span> {</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_layers"</span>: <span class="dv">2</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"units"</span>: [<span class="dv">64</span>, <span class="dv">64</span>],</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dropout"</span>: <span class="fl">.1</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>: <span class="dv">64</span>,</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"learning_rate"</span>: <span class="fl">1e-3</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>fixed_model <span class="op">=</span> build_mlp(FIXED_CONFIG)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>fixed_callbacks <span class="op">=</span> [tf.keras.callbacks.EarlyStopping(</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    monitor<span class="op">=</span><span class="st">"val_loss"</span>, patience<span class="op">=</span>BUDGET[<span class="st">"patience"</span>], restore_best_weights<span class="op">=</span><span class="va">True</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>)]</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>fixed_history <span class="op">=</span> fixed_model.fit(</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    X_train_s, y_train_s,</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    validation_data<span class="op">=</span>(X_val_s, y_val_s),</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    epochs<span class="op">=</span>BUDGET[<span class="st">"epochs"</span>], batch_size<span class="op">=</span>FIXED_CONFIG[<span class="st">"batch_size"</span>],</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    callbacks<span class="op">=</span>fixed_callbacks, verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>fixed_seconds <span class="op">=</span> time.perf_counter() <span class="op">-</span> started</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>fixed_best_epoch <span class="op">=</span> <span class="bu">int</span>(np.argmin(fixed_history.history[<span class="st">"val_loss"</span>]) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>fixed_val_pred <span class="op">=</span> y_scaler.inverse_transform(fixed_model.predict(X_val_s, verbose<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>validation_rows.append({</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"modelo"</span>: <span class="st">"MLP fija"</span>, <span class="op">**</span>regression_metrics(y_val, fixed_val_pred), <span class="st">"segundos"</span>: fixed_seconds</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(validation_rows).<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>WARNING:tensorflow:From d:\Documentos\Universidad Externado\Pregrado en Ciencia de Datos\Deep Learning\.venv\Lib\site-packages\keras\src\backend\common\global_state.py:82: The name tf.reset_default_graph is deprecated. Please use tf.compat.v1.reset_default_graph instead.
+
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow &gt;= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">modelo</th>
+<th data-quarto-table-cell-role="th">MAE_MW</th>
+<th data-quarto-table-cell-role="th">RMSE_MW</th>
+<th data-quarto-table-cell-role="th">R2</th>
+<th data-quarto-table-cell-role="th">segundos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Media</td>
+<td>15.026</td>
+<td>17.287</td>
+<td>-0.001</td>
+<td>0.009</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Lineal</td>
+<td>3.614</td>
+<td>4.571</td>
+<td>0.930</td>
+<td>0.013</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Boosting</td>
+<td>2.397</td>
+<td>3.361</td>
+<td>0.962</td>
+<td>3.333</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>MLP fija</td>
+<td>3.314</td>
+<td>4.284</td>
+<td>0.939</td>
+<td>14.441</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="por-qué-no-gridsearch-exhaustivo" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-no-gridsearch-exhaustivo">¿Por qué no GridSearch exhaustivo?</h3>
+<p>Con 1–3 capas y tres anchos posibles hay <span class="math inline">\(3 + 3^2 + 3^3 = 39\)</span> arquitecturas. Al multiplicar por cuatro tasas de dropout, tres batches y apenas cuatro tasas de aprendizaje discretizadas aparecen <strong>1.872 configuraciones</strong>. Early stopping reduce épocas, pero no elimina esta explosión de trials.</p>
+</section>
+</section>
+<section id="kerastuner-construcción-y-entrenamiento-como-hiperparámetros" class="level2">
+<h2 class="anchored" data-anchor-id="kerastuner-construcción-y-entrenamiento-como-hiperparámetros">5. KerasTuner: construcción y entrenamiento como hiperparámetros</h2>
+<p><code>HyperModel.build()</code> controla la arquitectura y el optimizador. <code>HyperModel.fit()</code> recibe el modelo ya construido y permite elegir el batch sin perder los callbacks internos del tuner.</p>
+<div id="1219a1a9" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PowerPlantHyperModel(kt.HyperModel):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> build(<span class="va">self</span>, hp):</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        n_layers <span class="op">=</span> hp.Int(<span class="st">"n_layers"</span>, <span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        all_units <span class="op">=</span> [hp.Choice(<span class="ss">f"units_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>, [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>)]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        config <span class="op">=</span> {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"n_layers"</span>: n_layers,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"units"</span>: all_units[:n_layers],</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"dropout"</span>: hp.Choice(<span class="st">"dropout"</span>, [<span class="fl">0.0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>]),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: hp.Choice(<span class="st">"batch_size"</span>, [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>]),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: hp.Float(<span class="st">"learning_rate"</span>, <span class="fl">1e-4</span>, <span class="fl">3e-3</span>, sampling<span class="op">=</span><span class="st">"log"</span>),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> build_mlp(config)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>, hp, model, <span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> model.fit(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>            <span class="op">*</span>args,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>            batch_size<span class="op">=</span>hp.get(<span class="st">"batch_size"</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>kwargs,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>kt_started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>keras_tuner <span class="op">=</span> kt.BayesianOptimization(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    hypermodel<span class="op">=</span>PowerPlantHyperModel(),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    objective<span class="op">=</span>kt.Objective(<span class="st">"val_loss"</span>, direction<span class="op">=</span><span class="st">"min"</span>),</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    max_trials<span class="op">=</span>BUDGET[<span class="st">"trials"</span>],</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span>SEED,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    overwrite<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    directory<span class="op">=</span>RUN_DIR <span class="op">/</span> <span class="st">"keras_tuner"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    project_name<span class="op">=</span><span class="st">"power_output"</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>keras_tuner.search(</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    X_train_s, y_train_s,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    validation_data<span class="op">=</span>(X_val_s, y_val_s),</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    epochs<span class="op">=</span>BUDGET[<span class="st">"epochs"</span>],</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    callbacks<span class="op">=</span>[tf.keras.callbacks.EarlyStopping(</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>        monitor<span class="op">=</span><span class="st">"val_loss"</span>, patience<span class="op">=</span>BUDGET[<span class="st">"patience"</span>], restore_best_weights<span class="op">=</span><span class="va">True</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    )],</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>kt_seconds <span class="op">=</span> time.perf_counter() <span class="op">-</span> kt_started</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>kt_rows <span class="op">=</span> []</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> trial_id, trial <span class="kw">in</span> keras_tuner.oracle.trials.items():</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    kt_rows.append({</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">"tool"</span>: <span class="st">"KerasTuner"</span>,</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>        <span class="st">"trial"</span>: trial_id,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>        <span class="st">"val_loss"</span>: trial.score,</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>        <span class="st">"estado"</span>: <span class="bu">str</span>(trial.status),</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>        <span class="st">"best_step"</span>: trial.best_step,</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>        <span class="op">**</span>trial.hyperparameters.values,</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>kt_results <span class="op">=</span> pd.DataFrame(kt_rows).sort_values(<span class="st">"val_loss"</span>)</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (kt_results[<span class="st">"estado"</span>] <span class="op">==</span> <span class="st">"COMPLETED"</span>).<span class="bu">any</span>(), <span class="st">"KerasTuner no completó ningún trial"</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> kt_results.loc[kt_results[<span class="st">"estado"</span>] <span class="op">==</span> <span class="st">"COMPLETED"</span>, <span class="st">"val_loss"</span>].notna().<span class="bu">all</span>()</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>kt_results.head().<span class="bu">round</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tool</th>
+<th data-quarto-table-cell-role="th">trial</th>
+<th data-quarto-table-cell-role="th">val_loss</th>
+<th data-quarto-table-cell-role="th">estado</th>
+<th data-quarto-table-cell-role="th">best_step</th>
+<th data-quarto-table-cell-role="th">n_layers</th>
+<th data-quarto-table-cell-role="th">units_0</th>
+<th data-quarto-table-cell-role="th">units_1</th>
+<th data-quarto-table-cell-role="th">units_2</th>
+<th data-quarto-table-cell-role="th">dropout</th>
+<th data-quarto-table-cell-role="th">batch_size</th>
+<th data-quarto-table-cell-role="th">learning_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">3</th>
+<td>KerasTuner</td>
+<td>3</td>
+<td>0.06186</td>
+<td>COMPLETED</td>
+<td>24</td>
+<td>2</td>
+<td>64</td>
+<td>32</td>
+<td>64</td>
+<td>0.2</td>
+<td>64</td>
+<td>0.00278</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">2</th>
+<td>KerasTuner</td>
+<td>2</td>
+<td>0.06273</td>
+<td>COMPLETED</td>
+<td>59</td>
+<td>1</td>
+<td>128</td>
+<td>128</td>
+<td>32</td>
+<td>0.0</td>
+<td>32</td>
+<td>0.00012</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">5</th>
+<td>KerasTuner</td>
+<td>5</td>
+<td>0.06305</td>
+<td>COMPLETED</td>
+<td>36</td>
+<td>2</td>
+<td>128</td>
+<td>64</td>
+<td>64</td>
+<td>0.2</td>
+<td>32</td>
+<td>0.00048</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4</th>
+<td>KerasTuner</td>
+<td>4</td>
+<td>0.06448</td>
+<td>COMPLETED</td>
+<td>59</td>
+<td>1</td>
+<td>128</td>
+<td>32</td>
+<td>64</td>
+<td>0.1</td>
+<td>128</td>
+<td>0.00019</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>KerasTuner</td>
+<td>0</td>
+<td>0.06771</td>
+<td>COMPLETED</td>
+<td>33</td>
+<td>2</td>
+<td>32</td>
+<td>32</td>
+<td>32</td>
+<td>0.1</td>
+<td>128</td>
+<td>0.00110</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="optuna-objetivo-define-by-run-y-pruning" class="level2">
+<h2 class="anchored" data-anchor-id="optuna-objetivo-define-by-run-y-pruning">6. Optuna: objetivo define-by-run y pruning</h2>
+<p>El callback reporta <code>val_loss</code> después de cada época. El <code>MedianPruner</code> puede abandonar una configuración cuando su trayectoria es poco competitiva frente a trials previos. Early stopping sigue activo: los mecanismos cumplen papeles distintos.</p>
+<div id="b040808c" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> OptunaPruningCallback(tf.keras.callbacks.Callback):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, trial, monitor<span class="op">=</span><span class="st">"val_loss"</span>):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.trial <span class="op">=</span> trial</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.monitor <span class="op">=</span> monitor</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_epoch_end(<span class="va">self</span>, epoch, logs<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        value <span class="op">=</span> (logs <span class="kw">or</span> {}).get(<span class="va">self</span>.monitor)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> value <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.trial.report(<span class="bu">float</span>(value), step<span class="op">=</span>epoch)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.trial.should_prune():</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> optuna.TrialPruned(<span class="ss">f"Podado en época </span><span class="sc">{</span>epoch <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optuna_objective(trial):</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    config <span class="op">=</span> {</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_layers"</span>: trial.suggest_int(<span class="st">"n_layers"</span>, <span class="dv">1</span>, <span class="dv">3</span>),</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"units"</span>: [],</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dropout"</span>: trial.suggest_categorical(<span class="st">"dropout"</span>, [<span class="fl">0.0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>]),</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"batch_size"</span>: trial.suggest_categorical(<span class="st">"batch_size"</span>, [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>]),</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: trial.suggest_float(<span class="st">"learning_rate"</span>, <span class="fl">1e-4</span>, <span class="fl">3e-3</span>, log<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    config[<span class="st">"units"</span>] <span class="op">=</span> [</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        trial.suggest_categorical(<span class="ss">f"units_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>, [<span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>])</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(config[<span class="st">"n_layers"</span>])</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> build_mlp(config, seed<span class="op">=</span>SEED <span class="op">+</span> trial.number)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        history <span class="op">=</span> model.fit(</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>            X_train_s, y_train_s,</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>            validation_data<span class="op">=</span>(X_val_s, y_val_s),</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>            epochs<span class="op">=</span>BUDGET[<span class="st">"epochs"</span>], batch_size<span class="op">=</span>config[<span class="st">"batch_size"</span>],</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>            callbacks<span class="op">=</span>[</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                OptunaPruningCallback(trial),</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>                tf.keras.callbacks.EarlyStopping(</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>                    monitor<span class="op">=</span><span class="st">"val_loss"</span>, patience<span class="op">=</span>BUDGET[<span class="st">"patience"</span>], restore_best_weights<span class="op">=</span><span class="va">True</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>            verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>        values <span class="op">=</span> history.history[<span class="st">"val_loss"</span>]</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>        trial.set_user_attr(<span class="st">"best_epoch"</span>, <span class="bu">int</span>(np.argmin(values) <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">float</span>(np.<span class="bu">min</span>(values))</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">finally</span>:</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>        trial.set_user_attr(<span class="st">"seconds"</span>, time.perf_counter() <span class="op">-</span> started)</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>optuna.logging.set_verbosity(optuna.logging.WARNING)</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>warmup <span class="op">=</span> <span class="dv">2</span> <span class="cf">if</span> MODE <span class="op">==</span> <span class="st">"smoke"</span> <span class="cf">else</span> <span class="dv">5</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> optuna.create_study(</span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"minimize"</span>,</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>    sampler<span class="op">=</span>optuna.samplers.TPESampler(seed<span class="op">=</span>SEED),</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    pruner<span class="op">=</span>optuna.pruners.MedianPruner(</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>        n_startup_trials<span class="op">=</span><span class="bu">max</span>(<span class="dv">1</span>, BUDGET[<span class="st">"trials"</span>] <span class="op">//</span> <span class="dv">4</span>), n_warmup_steps<span class="op">=</span>warmup</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>    study_name<span class="op">=</span><span class="st">"power_output"</span>,</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>opt_started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>study.optimize(optuna_objective, n_trials<span class="op">=</span>BUDGET[<span class="st">"trials"</span>], show_progress_bar<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>opt_seconds <span class="op">=</span> time.perf_counter() <span class="op">-</span> opt_started</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>opt_results <span class="op">=</span> study.trials_dataframe(</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>    attrs<span class="op">=</span>(<span class="st">"number"</span>, <span class="st">"value"</span>, <span class="st">"state"</span>, <span class="st">"params"</span>, <span class="st">"user_attrs"</span>)</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>).rename(columns<span class="op">=</span>{<span class="st">"number"</span>: <span class="st">"trial"</span>, <span class="st">"value"</span>: <span class="st">"val_loss"</span>, <span class="st">"state"</span>: <span class="st">"estado"</span>})</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>opt_results.insert(<span class="dv">0</span>, <span class="st">"tool"</span>, <span class="st">"Optuna"</span>)</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>opt_results.sort_values(<span class="st">"val_loss"</span>).head().<span class="bu">round</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">tool</th>
+<th data-quarto-table-cell-role="th">trial</th>
+<th data-quarto-table-cell-role="th">val_loss</th>
+<th data-quarto-table-cell-role="th">estado</th>
+<th data-quarto-table-cell-role="th">params_batch_size</th>
+<th data-quarto-table-cell-role="th">params_dropout</th>
+<th data-quarto-table-cell-role="th">params_learning_rate</th>
+<th data-quarto-table-cell-role="th">params_n_layers</th>
+<th data-quarto-table-cell-role="th">params_units_0</th>
+<th data-quarto-table-cell-role="th">params_units_1</th>
+<th data-quarto-table-cell-role="th">params_units_2</th>
+<th data-quarto-table-cell-role="th">user_attrs_best_epoch</th>
+<th data-quarto-table-cell-role="th">user_attrs_seconds</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">5</th>
+<td>Optuna</td>
+<td>5</td>
+<td>0.05930</td>
+<td>COMPLETE</td>
+<td>64</td>
+<td>0.0</td>
+<td>0.00019</td>
+<td>3</td>
+<td>32</td>
+<td>32.0</td>
+<td>64.0</td>
+<td>60.0</td>
+<td>17.04163</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Optuna</td>
+<td>1</td>
+<td>0.06303</td>
+<td>COMPLETE</td>
+<td>32</td>
+<td>0.2</td>
+<td>0.00018</td>
+<td>1</td>
+<td>32</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>60.0</td>
+<td>25.57136</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Optuna</td>
+<td>2</td>
+<td>0.06507</td>
+<td>COMPLETE</td>
+<td>32</td>
+<td>0.3</td>
+<td>0.00182</td>
+<td>2</td>
+<td>64</td>
+<td>32.0</td>
+<td>NaN</td>
+<td>16.0</td>
+<td>13.31269</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Optuna</td>
+<td>0</td>
+<td>0.06733</td>
+<td>COMPLETE</td>
+<td>64</td>
+<td>0.3</td>
+<td>0.00022</td>
+<td>1</td>
+<td>32</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>60.0</td>
+<td>16.66882</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>Optuna</td>
+<td>6</td>
+<td>0.07814</td>
+<td>PRUNED</td>
+<td>64</td>
+<td>0.1</td>
+<td>0.00015</td>
+<td>2</td>
+<td>128</td>
+<td>64.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>3.82483</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="trazabilidad-bajo-el-mismo-presupuesto" class="level2">
+<h2 class="anchored" data-anchor-id="trazabilidad-bajo-el-mismo-presupuesto">7. Trazabilidad bajo el mismo presupuesto</h2>
+<p>Esta tabla no es un campeonato universal entre librerías. KerasTuner usa optimización bayesiana; Optuna usa TPE y pruning. Comparamos lo que ocurrió bajo este protocolo: mejor validación, trials terminados, tiempo y configuración propuesta.</p>
+<div id="5c7bed6a" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trace <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"herramienta"</span>: <span class="st">"KerasTuner/Bayes"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"trials"</span>: <span class="bu">len</span>(kt_results),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"completos"</span>: <span class="bu">int</span>((kt_results[<span class="st">"estado"</span>] <span class="op">==</span> <span class="st">"COMPLETED"</span>).<span class="bu">sum</span>()),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"podados"</span>: <span class="dv">0</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mejor_val_loss"</span>: <span class="bu">float</span>(kt_results[<span class="st">"val_loss"</span>].<span class="bu">min</span>()),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"segundos"</span>: kt_seconds,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"herramienta"</span>: <span class="st">"Optuna/TPE"</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"trials"</span>: <span class="bu">len</span>(study.trials),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"completos"</span>: <span class="bu">sum</span>(t.state <span class="op">==</span> optuna.trial.TrialState.COMPLETE <span class="cf">for</span> t <span class="kw">in</span> study.trials),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"podados"</span>: <span class="bu">sum</span>(t.state <span class="op">==</span> optuna.trial.TrialState.PRUNED <span class="cf">for</span> t <span class="kw">in</span> study.trials),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mejor_val_loss"</span>: <span class="bu">float</span>(study.best_value),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"segundos"</span>: opt_seconds,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>trace.<span class="bu">round</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">herramienta</th>
+<th data-quarto-table-cell-role="th">trials</th>
+<th data-quarto-table-cell-role="th">completos</th>
+<th data-quarto-table-cell-role="th">podados</th>
+<th data-quarto-table-cell-role="th">mejor_val_loss</th>
+<th data-quarto-table-cell-role="th">segundos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>KerasTuner/Bayes</td>
+<td>8</td>
+<td>8</td>
+<td>0</td>
+<td>0.0619</td>
+<td>129.5754</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Optuna/TPE</td>
+<td>8</td>
+<td>4</td>
+<td>4</td>
+<td>0.0593</td>
+<td>88.3297</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d8fe2d1a" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> config_from_values(values):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    n_layers <span class="op">=</span> <span class="bu">int</span>(values[<span class="st">"n_layers"</span>])</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_layers"</span>: n_layers,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"units"</span>: [<span class="bu">int</span>(values[<span class="ss">f"units_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_layers)],</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dropout"</span>: <span class="bu">float</span>(values[<span class="st">"dropout"</span>]),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"batch_size"</span>: <span class="bu">int</span>(values[<span class="st">"batch_size"</span>]),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: <span class="bu">float</span>(values[<span class="st">"learning_rate"</span>]),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>candidate_configs <span class="op">=</span> {</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"KerasTuner"</span>: config_from_values(keras_tuner.get_best_hyperparameters(<span class="dv">1</span>)[<span class="dv">0</span>].values),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Optuna"</span>: config_from_values(study.best_trial.params),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(candidate_configs).T</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">n_layers</th>
+<th data-quarto-table-cell-role="th">units</th>
+<th data-quarto-table-cell-role="th">dropout</th>
+<th data-quarto-table-cell-role="th">batch_size</th>
+<th data-quarto-table-cell-role="th">learning_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">KerasTuner</th>
+<td>2</td>
+<td>[64, 32]</td>
+<td>0.2</td>
+<td>64</td>
+<td>0.002775</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Optuna</th>
+<td>3</td>
+<td>[32, 32, 64]</td>
+<td>0.0</td>
+<td>64</td>
+<td>0.000191</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="el-mejor-trial-puede-ser-una-inicialización-afortunada" class="level2">
+<h2 class="anchored" data-anchor-id="el-mejor-trial-puede-ser-una-inicialización-afortunada">8. El mejor trial puede ser una inicialización afortunada</h2>
+<p>Reentrenamos el ganador de cada herramienta con tres semillas en modos <code>class</code> y <code>full</code>. En <code>smoke</code> usamos una sola repetición porque ese modo verifica integridad, no estabilidad. Elegimos por MAE medio de validación y conservamos la dispersión.</p>
+<div id="c9c0c5de" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_candidate(label, config, seed):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> build_mlp(config, seed<span class="op">=</span>seed)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    history <span class="op">=</span> model.fit(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        X_train_s, y_train_s,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        validation_data<span class="op">=</span>(X_val_s, y_val_s),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        epochs<span class="op">=</span>BUDGET[<span class="st">"epochs"</span>], batch_size<span class="op">=</span>config[<span class="st">"batch_size"</span>],</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        callbacks<span class="op">=</span>[tf.keras.callbacks.EarlyStopping(</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>            monitor<span class="op">=</span><span class="st">"val_loss"</span>, patience<span class="op">=</span>BUDGET[<span class="st">"patience"</span>], restore_best_weights<span class="op">=</span><span class="va">True</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        )],</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> y_scaler.inverse_transform(model.predict(X_val_s, verbose<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"candidato"</span>: label,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"semilla"</span>: seed,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"MAE_MW"</span>: mean_absolute_error(y_val, pred),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"RMSE_MW"</span>: mean_squared_error(y_val, pred) <span class="op">**</span> <span class="fl">.5</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"best_epoch"</span>: <span class="bu">int</span>(np.argmin(history.history[<span class="st">"val_loss"</span>]) <span class="op">+</span> <span class="dv">1</span>),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"segundos"</span>: time.perf_counter() <span class="op">-</span> started,</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>robustness_rows <span class="op">=</span> []</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, config <span class="kw">in</span> candidate_configs.items():</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> offset <span class="kw">in</span> <span class="bu">range</span>(BUDGET[<span class="st">"repeats"</span>]):</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        robustness_rows.append(validate_candidate(label, config, SEED <span class="op">+</span> <span class="dv">100</span> <span class="op">+</span> offset))</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>robustness <span class="op">=</span> pd.DataFrame(robustness_rows)</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>stability <span class="op">=</span> robustness.groupby(<span class="st">"candidato"</span>).agg(</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    MAE_media<span class="op">=</span>(<span class="st">"MAE_MW"</span>, <span class="st">"mean"</span>),</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    MAE_sd<span class="op">=</span>(<span class="st">"MAE_MW"</span>, <span class="st">"std"</span>),</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    RMSE_media<span class="op">=</span>(<span class="st">"RMSE_MW"</span>, <span class="st">"mean"</span>),</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    mejor_epoca_mediana<span class="op">=</span>(<span class="st">"best_epoch"</span>, <span class="st">"median"</span>),</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    segundos<span class="op">=</span>(<span class="st">"segundos"</span>, <span class="st">"sum"</span>),</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>).fillna(<span class="dv">0</span>).sort_values(<span class="st">"MAE_media"</span>)</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>stability.<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">MAE_media</th>
+<th data-quarto-table-cell-role="th">MAE_sd</th>
+<th data-quarto-table-cell-role="th">RMSE_media</th>
+<th data-quarto-table-cell-role="th">mejor_epoca_mediana</th>
+<th data-quarto-table-cell-role="th">segundos</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">candidato</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Optuna</th>
+<td>3.169</td>
+<td>0.020</td>
+<td>4.151</td>
+<td>60.0</td>
+<td>50.643</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">KerasTuner</th>
+<td>3.412</td>
+<td>0.015</td>
+<td>4.370</td>
+<td>14.0</td>
+<td>25.937</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="reentrenamiento-y-única-apertura-del-test" class="level2">
+<h2 class="anchored" data-anchor-id="reentrenamiento-y-única-apertura-del-test">9. Reentrenamiento y única apertura del test</h2>
+<p>Fijamos la configuración con menor MAE medio y la mediana de sus mejores épocas. Después:</p>
+<ol type="1">
+<li>reunimos train + validación;</li>
+<li>reajustamos los escaladores en ese conjunto de desarrollo;</li>
+<li>entrenamos exactamente el número fijado de épocas;</li>
+<li>evaluamos una vez en test.</li>
+</ol>
+<p>Las referencias también se reentrenan con train + validación para una comparación justa.</p>
+<div id="e0ae4cf6" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>winner_label <span class="op">=</span> stability.index[<span class="dv">0</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>winner_config <span class="op">=</span> candidate_configs[winner_label]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>winner_epochs <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(<span class="bu">round</span>(stability.loc[winner_label, <span class="st">"mejor_epoca_mediana"</span>])))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>x_scaler_dev <span class="op">=</span> StandardScaler().fit(X_dev)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>y_scaler_dev <span class="op">=</span> StandardScaler().fit(y_dev.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>X_dev_s <span class="op">=</span> x_scaler_dev.transform(X_dev).astype(<span class="st">"float32"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>X_test_s <span class="op">=</span> x_scaler_dev.transform(X_test).astype(<span class="st">"float32"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>y_dev_s <span class="op">=</span> y_scaler_dev.transform(y_dev.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)).astype(<span class="st">"float32"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>final_model <span class="op">=</span> build_mlp(winner_config, seed<span class="op">=</span>SEED <span class="op">+</span> <span class="dv">999</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>final_started <span class="op">=</span> time.perf_counter()</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>final_model.fit(</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    X_dev_s, y_dev_s,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    epochs<span class="op">=</span>winner_epochs,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span>winner_config[<span class="st">"batch_size"</span>],</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>final_seconds <span class="op">=</span> time.perf_counter() <span class="op">-</span> final_started</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>final_pred <span class="op">=</span> y_scaler_dev.inverse_transform(final_model.predict(X_test_s, verbose<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>test_rows <span class="op">=</span> []</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, estimator <span class="kw">in</span> baseline_estimators.items():</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    fitted <span class="op">=</span> clone(estimator).fit(X_dev, y_dev)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    test_rows.append({<span class="st">"modelo"</span>: name, <span class="op">**</span>regression_metrics(y_test, fitted.predict(X_test))})</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>fixed_dev <span class="op">=</span> build_mlp(FIXED_CONFIG, seed<span class="op">=</span>SEED)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>fixed_dev.fit(</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    X_dev_s, y_dev_s, epochs<span class="op">=</span><span class="bu">max</span>(<span class="dv">1</span>, fixed_best_epoch),</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    batch_size<span class="op">=</span>FIXED_CONFIG[<span class="st">"batch_size"</span>], verbose<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>fixed_test_pred <span class="op">=</span> y_scaler_dev.inverse_transform(fixed_dev.predict(X_test_s, verbose<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>test_rows.append({<span class="st">"modelo"</span>: <span class="st">"MLP fija"</span>, <span class="op">**</span>regression_metrics(y_test, fixed_test_pred)})</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>test_rows.append({<span class="st">"modelo"</span>: <span class="ss">f"MLP afinada (</span><span class="sc">{</span>winner_label<span class="sc">}</span><span class="ss">)"</span>, <span class="op">**</span>regression_metrics(y_test, final_pred)})</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>test_results <span class="op">=</span> pd.DataFrame(test_rows).sort_values(<span class="st">"MAE_MW"</span>)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"ganador"</span>: winner_label, <span class="st">"config"</span>: winner_config, <span class="st">"epocas_finales"</span>: winner_epochs})</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>test_results.<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'ganador': 'Optuna', 'config': {'n_layers': 3, 'units': [32, 32, 64], 'dropout': 0.0, 'batch_size': 64, 'learning_rate': 0.0001914211592190575}, 'epocas_finales': 60}</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">modelo</th>
+<th data-quarto-table-cell-role="th">MAE_MW</th>
+<th data-quarto-table-cell-role="th">RMSE_MW</th>
+<th data-quarto-table-cell-role="th">R2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Boosting</td>
+<td>2.359</td>
+<td>3.156</td>
+<td>0.964</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4</th>
+<td>MLP afinada (Optuna)</td>
+<td>3.115</td>
+<td>4.008</td>
+<td>0.942</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">3</th>
+<td>MLP fija</td>
+<td>3.390</td>
+<td>4.254</td>
+<td>0.935</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Lineal</td>
+<td>3.534</td>
+<td>4.409</td>
+<td>0.930</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Media</td>
+<td>14.448</td>
+<td>16.680</td>
+<td>-0.000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="pregunta-de-decisión" class="level3">
+<h3 class="anchored" data-anchor-id="pregunta-de-decisión">Pregunta de decisión</h3>
+<p>Compare la MLP afinada con boosting. ¿La diferencia en MW compensa la búsqueda, la sensibilidad a semillas y el costo de mantener dos herramientas de tuning? Una recomendación válida puede concluir que la red <strong>no</strong> se justifica.</p>
+</section>
+</section>
+<section id="dónde-falla-el-modelo-final" class="level2">
+<h2 class="anchored" data-anchor-id="dónde-falla-el-modelo-final">10. ¿Dónde falla el modelo final?</h2>
+<p>Auditamos observado frente a predicho, residuos y MAE por cuartil de temperatura. Esta segmentación no reabre la selección: ocurre después de fijar y evaluar el modelo.</p>
+<div id="88f96446" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>audit <span class="op">=</span> X_test.copy()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>audit[<span class="st">"observado_MW"</span>] <span class="op">=</span> y_test.to_numpy()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>audit[<span class="st">"predicho_MW"</span>] <span class="op">=</span> final_pred</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>audit[<span class="st">"residuo_MW"</span>] <span class="op">=</span> audit[<span class="st">"observado_MW"</span>] <span class="op">-</span> audit[<span class="st">"predicho_MW"</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>audit[<span class="st">"error_abs_MW"</span>] <span class="op">=</span> audit[<span class="st">"residuo_MW"</span>].<span class="bu">abs</span>()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>audit[<span class="st">"cuartil_AT"</span>] <span class="op">=</span> pd.qcut(audit[<span class="st">"AT"</span>], <span class="dv">4</span>, duplicates<span class="op">=</span><span class="st">"drop"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">4.2</span>))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].scatter(audit[<span class="st">"observado_MW"</span>], audit[<span class="st">"predicho_MW"</span>], s<span class="op">=</span><span class="dv">18</span>, alpha<span class="op">=</span><span class="fl">.45</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>limits <span class="op">=</span> [audit[[<span class="st">"observado_MW"</span>, <span class="st">"predicho_MW"</span>]].<span class="bu">min</span>().<span class="bu">min</span>(), audit[[<span class="st">"observado_MW"</span>, <span class="st">"predicho_MW"</span>]].<span class="bu">max</span>().<span class="bu">max</span>()]</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(limits, limits, <span class="st">"--"</span>, color<span class="op">=</span><span class="st">"black"</span>, linewidth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Observado (MW)"</span>, ylabel<span class="op">=</span><span class="st">"Predicho (MW)"</span>, title<span class="op">=</span><span class="st">"Predicción frente a observación"</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>audit, x<span class="op">=</span><span class="st">"cuartil_AT"</span>, y<span class="op">=</span><span class="st">"residuo_MW"</span>, color<span class="op">=</span><span class="st">"#7cc7bd"</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, linewidth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].tick_params(axis<span class="op">=</span><span class="st">"x"</span>, rotation<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Cuartil de temperatura"</span>, ylabel<span class="op">=</span><span class="st">"Residuo: observado − predicho (MW)"</span>, title<span class="op">=</span><span class="st">"El promedio puede ocultar segmentos"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>audit.groupby(<span class="st">"cuartil_AT"</span>, observed<span class="op">=</span><span class="va">True</span>).agg(</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span>(<span class="st">"error_abs_MW"</span>, <span class="st">"size"</span>), MAE_MW<span class="op">=</span>(<span class="st">"error_abs_MW"</span>, <span class="st">"mean"</span>), sesgo_MW<span class="op">=</span>(<span class="st">"residuo_MW"</span>, <span class="st">"mean"</span>)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>).<span class="bu">round</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="sesion_09_tuning_regresion_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">n</th>
+<th data-quarto-table-cell-role="th">MAE_MW</th>
+<th data-quarto-table-cell-role="th">sesgo_MW</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">cuartil_AT</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">(3.209, 13.805]</th>
+<td>359</td>
+<td>3.346</td>
+<td>-0.294</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">(13.805, 20.59]</th>
+<td>359</td>
+<td>3.032</td>
+<td>-0.070</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">(20.59, 25.472]</th>
+<td>359</td>
+<td>2.823</td>
+<td>0.046</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">(25.472, 34.6]</th>
+<td>359</td>
+<td>3.260</td>
+<td>-0.112</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="pdp-e-ice-interrogar-la-función-predictiva" class="level2">
+<h2 class="anchored" data-anchor-id="pdp-e-ice-interrogar-la-función-predictiva">11. PDP e ICE: interrogar la función predictiva</h2>
+<p>Para una grilla de temperatura o vacío sustituimos esa columna en todas las observaciones de test y promediamos las predicciones. Las líneas ICE conservan respuestas individuales.</p>
+<p>Esto describe el modelo, no una intervención causal. Las combinaciones artificiales pueden salir de las regiones más frecuentes del conjunto.</p>
+<div id="6e44b146" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_mw(values):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> pd.DataFrame(values, columns<span class="op">=</span>FEATURES)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    scaled <span class="op">=</span> x_scaler_dev.transform(frame).astype(<span class="st">"float32"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    pred_s <span class="op">=</span> final_model(scaled, training<span class="op">=</span><span class="va">False</span>).numpy()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y_scaler_dev.inverse_transform(pred_s).ravel()</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pdp_ice(feature, n_grid<span class="op">=</span><span class="dv">25</span>, n_ice<span class="op">=</span><span class="dv">25</span>):</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    grid <span class="op">=</span> np.linspace(X_test[feature].quantile(<span class="fl">.02</span>), X_test[feature].quantile(<span class="fl">.98</span>), n_grid)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    ice_base <span class="op">=</span> X_test.sample(<span class="bu">min</span>(n_ice, <span class="bu">len</span>(X_test)), random_state<span class="op">=</span>SEED).copy()</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    pdp_values, ice_values <span class="op">=</span> [], []</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> value <span class="kw">in</span> grid:</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        pd_frame <span class="op">=</span> X_test.copy()</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        pd_frame[feature] <span class="op">=</span> value</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        pdp_values.append(predict_mw(pd_frame).mean())</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        ice_frame <span class="op">=</span> ice_base.copy()</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        ice_frame[feature] <span class="op">=</span> value</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        ice_values.append(predict_mw(ice_frame))</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> grid, np.asarray(pdp_values), np.asarray(ice_values).T</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">4.3</span>))</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, feature, label <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="st">"AT"</span>, <span class="st">"V"</span>], [<span class="st">"Temperatura ambiente (°C)"</span>, <span class="st">"Vacío de escape (cm Hg)"</span>]):</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    grid, pdp_values, ice_values <span class="op">=</span> pdp_ice(feature)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    ax.plot(grid, ice_values.T, color<span class="op">=</span><span class="st">"#9dc9c3"</span>, alpha<span class="op">=</span><span class="fl">.3</span>, linewidth<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    ax.plot(grid, pdp_values, color<span class="op">=</span><span class="st">"#0f766e"</span>, linewidth<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">"PDP"</span>)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    ax.<span class="bu">set</span>(xlabel<span class="op">=</span>label, ylabel<span class="op">=</span><span class="st">"Predicción (MW)"</span>, title<span class="op">=</span><span class="ss">f"PDP + ICE para </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    ax.legend()</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="sesion_09_tuning_regresion_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="shap-local-por-qué-esta-predicción-es-baja" class="level2">
+<h2 class="anchored" data-anchor-id="shap-local-por-qué-esta-predicción-es-baja">12. SHAP local: ¿por qué esta predicción es baja?</h2>
+<p>Elegimos la hora con menor predicción del test y usamos 100 observaciones de desarrollo como background. Con solo cuatro variables, el explicador exacto model-agnostic es viable.</p>
+<p>El waterfall reparte la diferencia respecto a la predicción de referencia. La atribución depende del modelo y del background; no prueba que modificar una variable produzca ese cambio físico.</p>
+<div id="8610623c" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>background <span class="op">=</span> X_dev.sample(<span class="bu">min</span>(<span class="dv">100</span>, <span class="bu">len</span>(X_dev)), random_state<span class="op">=</span>SEED)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>case_position <span class="op">=</span> <span class="bu">int</span>(np.argmin(final_pred))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>case <span class="op">=</span> X_test.iloc[[case_position]]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.Explainer(predict_mw, background, algorithm<span class="op">=</span><span class="st">"exact"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>case_shap <span class="op">=</span> explainer(case)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pd.concat([</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    case.reset_index(drop<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    pd.DataFrame({<span class="st">"predicción_MW"</span>: [final_pred[case_position]], <span class="st">"observado_MW"</span>: [y_test.iloc[case_position]]})</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>], axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">round</span>(<span class="dv">3</span>))</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>shap.plots.waterfall(case_shap[<span class="dv">0</span>], max_display<span class="op">=</span><span class="dv">5</span>, show<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      AT      V       AP     RH  predicción_MW  observado_MW
+0  34.14  74.34  1000.19  43.56     425.609985        434.23</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="sesion_09_tuning_regresion_files/figure-html/cell-16-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="dictamen-para-el-responsable-de-la-planta" class="level2">
+<h2 class="anchored" data-anchor-id="dictamen-para-el-responsable-de-la-planta">13. Dictamen para el responsable de la planta</h2>
+<section id="conclusión-de-esta-ejecución-modeclass" class="level3">
+<h3 class="anchored" data-anchor-id="conclusión-de-esta-ejecución-modeclass">Conclusión de esta ejecución (<code>mode=class</code>)</h3>
+<ol type="1">
+<li><p><strong>Optuna encontró la mejor MLP bajo el presupuesto disponible.</strong> Su arquitectura <code>4 → 32 → 32 → 64 → 1</code>, sin dropout, batch 64 y learning rate <span class="math inline">\(1,91\times10^{-4}\)</span> alcanzó un MAE medio de validación de <strong>3,169 MW</strong>, 7,1 % menor que el candidato de KerasTuner (<strong>3,412 MW</strong>). La variación entre tres semillas fue pequeña (SD = <strong>0,020 MW</strong>), por lo que la diferencia no parece explicarse únicamente por una inicialización afortunada.</p></li>
+<li><p><strong>El pruning redujo cómputo, pero no permite declarar que Optuna sea universalmente superior.</strong> Optuna completó 4 de 8 trials y podó 4; consumió <strong>88,3 s</strong>, frente a <strong>129,6 s</strong> de KerasTuner. El ahorro observado fue cercano al 32 %, pero se compararon TPE con pruning y búsqueda bayesiana sin pruning, no solamente dos implementaciones equivalentes.</p></li>
+<li><p><strong>El tuning mejoró la red, no el ganador global.</strong> En test, la MLP afinada logró <strong>MAE = 3,115 MW</strong>, <strong>RMSE = 4,008 MW</strong> y <span class="math inline">\(R^2=0,942\)</span>. Mejoró 8,1 % el MAE de la MLP fija y 11,9 % el modelo lineal. Sin embargo, boosting obtuvo <strong>MAE = 2,359 MW</strong>, <strong>RMSE = 3,156 MW</strong> y <span class="math inline">\(R^2=0,964\)</span>: un MAE 24,3 % menor que la MLP afinada. Para estos datos tabulares, no hay evidencia para recomendar la red como modelo productivo principal.</p></li>
+<li><p><strong>El error medio es relativamente estable, aunque persisten casos extremos.</strong> El MAE por cuartil de temperatura varió entre <strong>2,823 y 3,346 MW</strong> y el sesgo medio permaneció cerca de cero. El segmento más difícil fue el de temperaturas más bajas, seguido por el más cálido; los boxplots también muestran errores aislados superiores a 10 MW que ameritan revisión individual.</p></li>
+<li><p><strong>La función aprendida atribuye el mayor cambio a la temperatura.</strong> El PDP de <code>AT</code> desciende de aproximadamente 482 a 435 MW entre 6 y 32 °C; el de <code>V</code> disminuye de forma más moderada, alrededor de 460 a 449 MW. Las curvas ICE revelan heterogeneidad, especialmente para <code>V</code>, por lo que el promedio no representa igual a todas las observaciones. Son asociaciones del modelo, no efectos causales ni recomendaciones de operación.</p></li>
+<li><p><strong>El SHAP local explica una predicción baja, pero también descubre un error relevante.</strong> Para el caso <code>AT=34,14</code>, <code>V=74,34</code>, <code>AP=1000,19</code>, <code>RH=43,56</code>, la predicción fue <strong>425,61 MW</strong> frente a <strong>434,23 MW</strong> observados: una subestimación de <strong>8,62 MW</strong>. Respecto a la referencia de 455,18 MW, <code>AT</code> aportó −24,06 MW, <code>V</code> −5,68 MW, <code>AP</code> −2,95 MW y <code>RH</code> +3,12 MW. Esto explica la salida del modelo; no demuestra mecanismos físicos.</p></li>
+<li><p><strong>La selección sigue censurada por el presupuesto.</strong> Las tres repeticiones del candidato de Optuna alcanzaron la época máxima 60, de modo que early stopping no confirmó convergencia. Debemos llamarlo <em>mejor configuración encontrada con 8 trials y 60 épocas</em>, no arquitectura óptima. Antes de cerrar el estudio convendría ampliar únicamente el presupuesto del candidato final y comprobar si su validación todavía mejora, manteniendo test cerrado.</p></li>
+</ol>
+</section>
+<section id="recomendación-al-responsable" class="level3">
+<h3 class="anchored" data-anchor-id="recomendación-al-responsable">Recomendación al responsable</h3>
+<p>Usar <strong>boosting como referencia operativa preferida</strong> por su menor error y menor complejidad de entrenamiento. Conservar la MLP afinada como experimento comparativo y como base para estudiar estabilidad e interpretabilidad. Ninguno de los resultados permite inferir causalidad ni desempeño futuro: el conjunto no incluye fechas para validación temporal y solo representa operación a carga completa.</p>
+</section>
+</section>
+<section id="manifiesto-de-trazabilidad" class="level2">
+<h2 class="anchored" data-anchor-id="manifiesto-de-trazabilidad">14. Manifiesto de trazabilidad</h2>
+<p>Guardamos localmente versiones, hash de datos, presupuesto, splits, configuración seleccionada y métricas. El directorio <code>runs/</code> no se versiona porque contiene checkpoints y resultados dependientes de la máquina.</p>
+<div id="9d02340e" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data_sha256 <span class="op">=</span> hashlib.sha256(DATA_PATH.read_bytes()).hexdigest()</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>manifest <span class="op">=</span> {</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"seed"</span>: SEED,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mode"</span>: MODE,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"budget"</span>: BUDGET,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"versions"</span>: {</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"python"</span>: platform.python_version(),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"tensorflow"</span>: tf.__version__,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sklearn"</span>: sklearn.__version__,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"keras_tuner"</span>: kt.__version__,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"optuna"</span>: optuna.__version__,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"shap"</span>: shap.__version__,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data"</span>: {<span class="st">"path"</span>: <span class="bu">str</span>(DATA_PATH.relative_to(ROOT)), <span class="st">"sha256"</span>: data_sha256, <span class="st">"rows"</span>: <span class="bu">len</span>(data)},</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"splits"</span>: {<span class="st">"train"</span>: <span class="bu">len</span>(X_train), <span class="st">"validation"</span>: <span class="bu">len</span>(X_val), <span class="st">"test"</span>: <span class="bu">len</span>(X_test)},</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"winner"</span>: winner_label,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"winner_config"</span>: winner_config,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"final_epochs"</span>: winner_epochs,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"final_training_seconds"</span>: final_seconds,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test_metrics"</span>: test_results.to_dict(orient<span class="op">=</span><span class="st">"records"</span>),</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>manifest_path <span class="op">=</span> RUN_DIR <span class="op">/</span> <span class="st">"manifest.json"</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>manifest_path.write_text(json.dumps(manifest, indent<span class="op">=</span><span class="dv">2</span>, ensure_ascii<span class="op">=</span><span class="va">False</span>), encoding<span class="op">=</span><span class="st">"utf-8"</span>)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Manifiesto: </span><span class="sc">{</span>manifest_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps({k: manifest[k] <span class="cf">for</span> k <span class="kw">in</span> [<span class="st">"mode"</span>, <span class="st">"data"</span>, <span class="st">"splits"</span>, <span class="st">"winner"</span>, <span class="st">"final_epochs"</span>]}, indent<span class="op">=</span><span class="dv">2</span>, ensure_ascii<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Manifiesto: d:\Documentos\Universidad Externado\Pregrado en Ciencia de Datos\Deep Learning\notebooks\semana-04\runs\class\manifest.json
+{
+  "mode": "class",
+  "data": {
+    "path": "datasets\\public\\combined_cycle_power_plant.csv",
+    "sha256": "d74ce3c25f0ce44a51d574913f494ec40fb8c058ad3624220ad45b866f87a487",
+    "rows": 9568
+  },
+  "splits": {
+    "train": 6696,
+    "validation": 1436,
+    "test": 1436
+  },
+  "winner": "Optuna",
+  "final_epochs": 60
+}</code></pre>
+</div>
+</div>
+</section>
+<section id="mensaje-de-salida" class="level2">
+<h2 class="anchored" data-anchor-id="mensaje-de-salida">Mensaje de salida</h2>
+<p>El tuning produjo una MLP más estable y precisa que las alternativas neuronales y lineales, pero no superó la referencia de boosting. La conclusión responsable no es que Optuna o una red profunda “ganaron”, sino que el presupuesto de búsqueda mejoró una familia que, para este conjunto tabular, todavía no justifica desplazar al mejor baseline.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

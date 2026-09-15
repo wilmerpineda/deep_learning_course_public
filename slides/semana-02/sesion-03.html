@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <title>Deep Learning – sesion-03</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="../../assets/styles/course.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+
+<section id="activaciones-y-funciones-de-pérdida" class="slide level2 title-slide center">
+<h2>Activaciones y funciones de pérdida</h2>
+<h3 id="qué-puede-representar-la-red-y-qué-intenta-corregir">Qué puede representar la red y qué intenta corregir</h3>
+<p><strong>Deep Learning · Sesión 3</strong></p>
+</section>
+<section id="resultado-de-aprendizaje" class="slide level2">
+<h2>Resultado de aprendizaje</h2>
+<p>Al terminar podrá:</p>
+<ul>
+<li>seguir la notación de una red densa por capas;</li>
+<li>interpretar activaciones como transformaciones con dominio y derivada;</li>
+<li>distinguir logits, probabilidades, pérdida y métrica;</li>
+<li>elegir una salida y una pérdida compatibles con la tarea;</li>
+<li>anticipar la señal local que recibe el logit.</li>
+</ul>
+</section>
+<section id="la-red-necesita-dos-decisiones-distintas" class="slide level2">
+<h2>La red necesita dos decisiones distintas</h2>
+<div class="black-box">
+<p>La <strong>activación</strong> determina cómo se transforma la representación. La <strong>pérdida</strong> determina qué desacuerdo debe reducir el entrenamiento.</p>
+</div>
+<p>Una red puede tener capacidad para separar los datos y, aun así, aprender una tarea equivocada si su salida y su pérdida no representan correctamente a <span class="math inline">Y</span>.</p>
+<aside class="notes">
+<p>[Sources] - Goodfellow, Bengio &amp; Courville (2016), Deep Learning, capítulos 6 y 8.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="notación-que-conservaremos" class="slide level2">
+<h2>Notación que conservaremos</h2>
+<p>Para un batch de <span class="math inline">B</span> casos con <span class="math inline">D</span> características:</p>
+<p><span class="math display">X=A^{(0)}\in\mathbb{R}^{B\times D}</span></p>
+<p>En la capa <span class="math inline">l</span> con <span class="math inline">H_l</span> unidades:</p>
+<p><span class="math display">Z^{(l)}=A^{(l-1)}W^{(l)}+b^{(l)},\qquad A^{(l)}=\phi^{(l)}(Z^{(l)})</span></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Objeto</th>
+<th style="text-align: right;">Shape</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">W^{(l)}</span></td>
+<td style="text-align: right;"><span class="math inline">(H_{l-1},H_l)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">b^{(l)}</span></td>
+<td style="text-align: right;"><span class="math inline">(H_l,)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">Z^{(l)},A^{(l)}</span></td>
+<td style="text-align: right;"><span class="math inline">(B,H_l)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sin-no-linealidad-la-profundidad-colapsa" class="slide level2">
+<h2>Sin no linealidad, la profundidad colapsa</h2>
+<p>Dos capas afines consecutivas satisfacen:</p>
+<p><span class="math display">
+(XW^{(1)}+b^{(1)})W^{(2)}+b^{(2)}
+=X\widetilde W+\widetilde b
+</span></p>
+<p>donde</p>
+<p><span class="math display">\widetilde W=W^{(1)}W^{(2)},\qquad
+\widetilde b=b^{(1)}W^{(2)}+b^{(2)}.</span></p>
+<p>La composición sigue siendo una transformación afín. La activación cambia la familia de funciones representables.</p>
+</section>
+<section id="relu-conserva-la-señal-positiva" class="slide level2">
+<h2>ReLU conserva la señal positiva</h2>
+<p><span class="math display">
+\operatorname{ReLU}(z)=\max(0,z),\qquad
+\operatorname{ReLU}'(z)=
+\begin{cases}
+0,&amp;z&lt;0\\
+1,&amp;z&gt;0
+\end{cases}
+</span></p>
+<ul>
+<li>Dominio: <span class="math inline">\mathbb{R}</span>; codominio: <span class="math inline">[0,\infty)</span>.</li>
+<li>No satura en la región positiva.</li>
+<li>En <span class="math inline">z=0</span> no es diferenciable; la implementación adopta una subderivada.</li>
+<li>Una unidad que permanece en <span class="math inline">z&lt;0</span> produce activación y derivada nulas.</li>
+</ul>
+<aside class="notes">
+<p>[Sources] - Nair &amp; Hinton (2010), Rectified Linear Units Improve Restricted Boltzmann Machines. - TensorFlow API, tf.keras.activations.relu.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="sigmoid-convierte-un-logit-en-probabilidad" class="slide level2">
+<h2>Sigmoid convierte un logit en probabilidad</h2>
+<p><span class="math display">
+\sigma(z)=\frac{1}{1+e^{-z}},\qquad
+\sigma'(z)=\sigma(z)(1-\sigma(z))
+</span></p>
+<ul>
+<li>Dominio: <span class="math inline">\mathbb{R}</span>; codominio: <span class="math inline">(0,1)</span>.</li>
+<li><span class="math inline">\sigma(0)=0.5</span>.</li>
+<li>Para <span class="math inline">|z|</span> grande, la derivada se aproxima a cero.</li>
+<li>Es natural para una probabilidad Bernoulli, no para toda capa oculta.</li>
+</ul>
+<div class="checkpoint">
+<p>¿Dónde es máxima <span class="math inline">\sigma'(z)</span> y qué implica para logits extremos?</p>
+</div>
+</section>
+<section id="tanh-centra-la-activación-alrededor-de-cero" class="slide level2">
+<h2>Tanh centra la activación alrededor de cero</h2>
+<p><span class="math display">
+\tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}},\qquad
+\tanh'(z)=1-\tanh^2(z)
+</span></p>
+<ul>
+<li>Codominio: <span class="math inline">(-1,1)</span>.</li>
+<li>Tiene signo y está centrada en cero.</li>
+<li>También satura cuando <span class="math inline">|z|</span> crece.</li>
+</ul>
+<p>Sigmoid y tanh son suaves, pero su derivada puede volverse muy pequeña. La consecuencia entre muchas capas se estudiará con backpropagation.</p>
+</section>
+<section id="softmax-acopla-las-clases" class="slide level2">
+<h2>Softmax acopla las clases</h2>
+<p>Para <span class="math inline">K</span> logits de un caso:</p>
+<p><span class="math display">
+\operatorname{softmax}(\mathbf z)_k=
+\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}}
+</span></p>
+<p><span class="math display">\hat{\mathbf p}\in(0,1)^K,\qquad \sum_{k=1}^{K}\hat p_k=1</span></p>
+<p>Aumentar un logit cambia todas las probabilidades. Por eso softmax representa clases mutuamente excluyentes.</p>
+</section>
+<section id="desplazar-los-logits-no-cambia-softmax" class="slide level2">
+<h2>Desplazar los logits no cambia softmax</h2>
+<p>Para cualquier constante <span class="math inline">c</span>:</p>
+<p><span class="math display">\operatorname{softmax}(\mathbf z)=\operatorname{softmax}(\mathbf z-c\mathbf 1).</span></p>
+<p>Elegir <span class="math inline">c=\max_k z_k</span> evita exponentes innecesariamente grandes:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a aria-label="1"></a>shifted <span class="op">=</span> logits <span class="op">-</span> logits.<span class="bu">max</span>(axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-2"><a aria-label="2"></a>probs <span class="op">=</span> np.exp(shifted) <span class="op">/</span> np.exp(shifted).<span class="bu">sum</span>(axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>La forma matemática es equivalente; la forma computacional es más estable.</p>
+<aside class="notes">
+<p>[Sources] - Goodfellow, Bengio &amp; Courville (2016), sección 4.1 sobre underflow y overflow.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="pérdida-objetivo-y-métrica-no-son-sinónimos" class="slide level2">
+<h2>Pérdida, objetivo y métrica no son sinónimos</h2>
+<p><span class="math display">
+\ell_i=\ell(y_i,f(x_i;\theta)),\qquad
+J_{\mathcal B}(\theta)=\frac{1}{B}\sum_{i\in\mathcal B}\ell_i
+</span></p>
+<ul>
+<li><strong>Pérdida:</strong> desacuerdo diferenciable por caso.</li>
+<li><strong>Objetivo:</strong> agregación que el optimizador intenta reducir.</li>
+<li><strong>Métrica:</strong> evidencia interpretable; no tiene que ser diferenciable.</li>
+</ul>
+<p>Accuracy no indica cuánta confianza equivocada produjo el modelo.</p>
+</section>
+<section id="mse-mide-distancia-cuadrática" class="slide level2">
+<h2>MSE mide distancia cuadrática</h2>
+<p>Para una salida escalar:</p>
+<p><span class="math display">\ell_{\mathrm{MSE}}(y,\hat y)=(y-\hat y)^2,</span></p>
+<p><span class="math display">\frac{\partial \ell}{\partial \hat y}=2(\hat y-y).</span></p>
+<ul>
+<li>Natural cuando la salida es continua y el error cuadrático representa el costo.</li>
+<li>Penaliza más los residuos grandes.</li>
+<li>Su escala depende de la escala de <span class="math inline">Y</span>.</li>
+</ul>
+<aside class="notes">
+<p>[Sources] - Bishop (2006), Pattern Recognition and Machine Learning, sección 1.2.5. - Bajo ruido gaussiano homocedástico, minimizar MSE equivale a maximizar la verosimilitud.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="bce-compara-una-etiqueta-bernoulli" class="slide level2">
+<h2>BCE compara una etiqueta Bernoulli</h2>
+<p>Para <span class="math inline">y\in\{0,1\}</span> y <span class="math inline">\hat p\in(0,1)</span>:</p>
+<p><span class="math display">
+\ell_{\mathrm{BCE}}(y,\hat p)=
+-y\log\hat p-(1-y)\log(1-\hat p).
+</span></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Etiqueta</th>
+<th>Contribución</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">y=1</span></td>
+<td><span class="math inline">-\log\hat p</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">y=0</span></td>
+<td><span class="math inline">-\log(1-\hat p)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Una predicción correcta y confiada cuesta poco; una equivocación confiada cuesta mucho.</p>
+</section>
+<section id="sigmoid-y-bce-producen-una-señal-simple" class="slide level2">
+<h2>Sigmoid y BCE producen una señal simple</h2>
+<p>Si <span class="math inline">\hat p=\sigma(z)</span>, entonces:</p>
+<p><span class="math display">
+\frac{\partial \ell}{\partial z}
+=\frac{\partial \ell}{\partial \hat p}
+\frac{\partial \hat p}{\partial z}
+=\hat p-y.
+</span></p>
+<div class="evidence">
+<p>El logit recibe la diferencia entre la probabilidad estimada y la etiqueta. La propagación de esta señal hacia capas anteriores queda para la sesión 6.</p>
+</div>
+</section>
+<section id="cce-selecciona-la-probabilidad-de-la-clase-correcta" class="slide level2">
+<h2>CCE selecciona la probabilidad de la clase correcta</h2>
+<p>Con etiqueta one-hot <span class="math inline">\mathbf y</span> y softmax <span class="math inline">\hat{\mathbf p}</span>:</p>
+<p><span class="math display">
+\ell_{\mathrm{CCE}}(\mathbf y,\hat{\mathbf p})
+=-\sum_{k=1}^{K}y_k\log\hat p_k.
+</span></p>
+<p>Si la clase correcta es <span class="math inline">c</span>, entonces <span class="math inline">\ell=-\log\hat p_c</span> y:</p>
+<p><span class="math display">\nabla_{\mathbf z}\ell=\hat{\mathbf p}-\mathbf y.</span></p>
+<p><code>CategoricalCrossentropy</code> recibe one-hot; <code>SparseCategoricalCrossentropy</code> recibe el índice de clase.</p>
+</section>
+<section id="kl-mide-discrepancia-entre-distribuciones" class="slide level2">
+<h2>KL mide discrepancia entre distribuciones</h2>
+<p><span class="math display">
+D_{\mathrm{KL}}(P\|Q)=\sum_k P_k\log\frac{P_k}{Q_k}\geq 0.
+</span></p>
+<ul>
+<li>No es simétrica: <span class="math inline">D_{\mathrm{KL}}(P\|Q)\neq D_{\mathrm{KL}}(Q\|P)</span>.</li>
+<li>Es cero solo cuando las distribuciones coinciden casi en todas partes.</li>
+<li>Para una distribución objetivo fija, minimizar cross-entropy respecto de <span class="math inline">Q</span> también minimiza la KL:</li>
+</ul>
+<p><span class="math display">H(P,Q)=H(P)+D_{\mathrm{KL}}(P\|Q).</span></p>
+<aside class="notes">
+<p>[Sources] - Cover &amp; Thomas (2006), Elements of Information Theory, capítulo 2.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="la-estructura-de-y-decide-la-salida" class="slide level2">
+<h2>La estructura de <span class="math inline">Y</span> decide la salida</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Tarea</th>
+<th style="text-align: right;">Salida</th>
+<th>Activación</th>
+<th>Pérdida</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Regresión escalar</td>
+<td style="text-align: right;">1</td>
+<td>lineal</td>
+<td>MSE/MAE</td>
+</tr>
+<tr class="even">
+<td>Binaria</td>
+<td style="text-align: right;">1</td>
+<td>sigmoid</td>
+<td>BCE</td>
+</tr>
+<tr class="odd">
+<td>Multiclase exclusiva</td>
+<td style="text-align: right;"><span class="math inline">K</span></td>
+<td>softmax</td>
+<td>CCE/SCCE</td>
+</tr>
+<tr class="even">
+<td>Multilabel</td>
+<td style="text-align: right;"><span class="math inline">K</span></td>
+<td>sigmoid por etiqueta</td>
+<td>BCE</td>
+</tr>
+</tbody>
+</table>
+<p>Softmax obliga competencia entre clases. Sigmoid permite que varias etiquetas sean verdaderas simultáneamente.</p>
+</section>
+<section id="logits-o-probabilidades-hay-que-elegir-una-ruta" class="slide level2">
+<h2>Logits o probabilidades: hay que elegir una ruta</h2>
+<p>Ruta explícita:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a aria-label="1"></a>Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="st">"sigmoid"</span>)</span>
+<span id="cb2-2"><a aria-label="2"></a>BinaryCrossentropy(from_logits<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ruta numéricamente integrada:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a aria-label="1"></a>Dense(<span class="dv">1</span>, activation<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb3-2"><a aria-label="2"></a>BinaryCrossentropy(from_logits<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="checkpoint">
+<p>¿Qué ocurre si entregamos probabilidades y declaramos <code>from_logits=True</code>?</p>
+</div>
+<aside class="notes">
+<p>[Sources] - Keras API, Probabilistic losses.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="cuatro-configuraciones-para-auditar" class="slide level2">
+<h2>Cuatro configuraciones para auditar</h2>
+<ol type="1">
+<li>Una probabilidad de fraude: <code>Dense(1, sigmoid)</code> + BCE.</li>
+<li>Una especie entre cinco: <code>Dense(5, softmax)</code> + sparse CCE si <span class="math inline">y</span> es un índice.</li>
+<li>Varias etiquetas por imagen: <code>Dense(K, sigmoid)</code> + BCE.</li>
+<li>Una demanda continua: <code>Dense(1, linear)</code> + MSE o MAE según el costo.</li>
+</ol>
+<p>La configuración correcta expresa la semántica de la variable objetivo antes de entrenar.</p>
+</section>
+<section id="salida-de-clase" class="slide level2">
+<h2>Salida de clase</h2>
+<p>Para cada tarea asignada:</p>
+<ol type="1">
+<li>declare el shape y la codificación de <span class="math inline">Y</span>;</li>
+<li>defina unidades y activación de salida;</li>
+<li>escriba la pérdida por observación;</li>
+<li>indique si la implementación recibe logits o probabilidades;</li>
+<li>explique qué error recibe mayor penalización.</li>
+</ol>
+<div class="evidence">
+<p>Una salida no es un detalle de Keras: es una hipótesis probabilística sobre la tarea.</p>
+</div>
+</section>
+<section id="próximo-paso" class="slide level2">
+<h2>Próximo paso</h2>
+<h3 id="del-desacuerdo-a-una-actualización">Del desacuerdo a una actualización</h3>
+<p>Ya sabemos qué objetivo queremos reducir. Ahora formalizaremos cómo el gradiente define una dirección local y cómo la tasa y el batch cambian la trayectoria observable.</p>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiado");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiado");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
